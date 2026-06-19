@@ -2,7 +2,7 @@ import { _decorator, Component, Node, Vec3, Canvas, UITransform, view, Camera, W
 import { PetManager } from './Pet/PetManager';
 import { PetType, GAME_SAVE_KEY, PET_DEFINITIONS, StudentData, PetData, GrowthStage } from './Pet/PetData';
 import { UIManager, UICallbacks } from './UI/UIManager';
-import { MockApiService } from './Api/MockApiService';
+import { RealApiService } from './Api/RealApiService';
 import { PetApiService } from './Api/PetApiService';
 import { PetGalleryPanel } from './Pet/PetGalleryPanel';
 import { EffectManager } from './Effect/EffectManager';
@@ -14,7 +14,7 @@ const { ccclass } = _decorator;
 
 @ccclass('Main')
 export class Main extends Component {
-    private api: MockApiService = new MockApiService();
+    private api: RealApiService = new RealApiService();
     private petApi: PetApiService = new PetApiService();
     private galleryPanel: PetGalleryPanel | null = null;
     private petManager: PetManager | null = null;
@@ -111,7 +111,7 @@ export class Main extends Component {
 
     /**
      * 宠物图鉴入口:右上角悬浮「图鉴」按钮,点击拉取后台配置的宠物并支持按积分解锁。
-     * 图鉴数据走真实接口(PetApiService -> 服务端 /api/pet/*),与本地 MockApiService 互不影响。
+     * 图鉴数据走真实接口(PetApiService -> 服务端 /api/pet/*);养成数据走 RealApiService(/api/game/*)。
      */
     private setupPetGallery(): void {
         const root = this.canvasNode || this.node;
