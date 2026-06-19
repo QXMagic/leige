@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>宠物图鉴</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html,
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(180deg, #2b1b5e 0%, #1a1033 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .app {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            padding: 16px 14px 80px;
+        }
+        /* 顶部积分栏 */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            backdrop-filter: blur(6px);
+            margin-bottom: 18px;
+        }
+        .header .title {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        .points-box {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: linear-gradient(90deg, #ffb73a, #ff7e3a);
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(255, 126, 58, 0.4);
+        }
+        .points-box .icon {
+            font-size: 16px;
+        }
+        /* 筛选条 */
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            scrollbar-width: none;
+        }
+        .filter-bar::-webkit-scrollbar {
+            display: none;
+        }
+        .filter-chip {
+            flex-shrink: 0;
+            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            font-size: 13px;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .filter-chip.active {
+            background: linear-gradient(90deg, #8a5cff, #c45cff);
+            color: #fff;
+            font-weight: 600;
+        }
+        /* 宠物网格 */
+        .pet-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .pet-card {
+            position: relative;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: transform 0.15s;
+        }
+        .pet-card:active {
+            transform: scale(0.98);
+        }
+        .pet-card.locked .pet-image {
+            filter: brightness(0.4) grayscale(1);
+        }
+        .pet-image {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            background: #1a1033;
+            display: block;
+        }
+        .pet-info {
+            padding: 10px 12px 12px;
+        }
+        .pet-name {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .attr-tag,
+        .quality-tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-weight: 500;
+        }
+        .attr-fire { background: rgba(255, 80, 80, 0.25); color: #ff8a8a; }
+        .attr-water { background: rgba(80, 160, 255, 0.25); color: #8ac4ff; }
+        .attr-wood { background: rgba(80, 220, 120, 0.25); color: #8aff9c; }
+        .attr-light { background: rgba(255, 220, 80, 0.25); color: #ffe08a; }
+        .attr-dark { background: rgba(160, 80, 255, 0.25); color: #c08aff; }
+
+        .quality-1 { background: rgba(180, 180, 180, 0.25); color: #ccc; }
+        .quality-2 { background: rgba(80, 180, 255, 0.25); color: #8ac4ff; }
+        .quality-3 { background: rgba(180, 80, 255, 0.25); color: #c08aff; }
+        .quality-4 { background: rgba(255, 180, 80, 0.25); color: #ffd28a; }
+
+        .pet-points {
+            font-size: 12px;
+            color: #ffb73a;
+            margin-top: 4px;
+        }
+        .pet-points.locked-cost {
+            color: #ff6b6b;
+        }
+        /* 锁定遮罩 */
+        .lock-mask {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .unlock-btn {
+            width: 100%;
+            margin-top: 8px;
+            padding: 8px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .unlock-btn.can {
+            background: linear-gradient(90deg, #ffb73a, #ff7e3a);
+            color: #fff;
+        }
+        .unlock-btn.can:active {
+            transform: scale(0.97);
+        }
+        .unlock-btn.cant {
+            background: rgba(255, 255, 255, 0.08);
+            color: #888;
+            cursor: not-allowed;
+        }
+        .unlock-btn.done {
+            background: rgba(80, 220, 120, 0.2);
+            color: #8aff9c;
+            cursor: default;
+        }
+        /* 加载/空状态 */
+        .loading,
+        .empty {
+            text-align: center;
+            padding: 60px 0;
+            color: #aaa;
+            font-size: 14px;
+        }
+        .loading .spinner {
+            width: 28px;
+            height: 28px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #8a5cff;
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-size: 14px;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s;
+            max-width: 80%;
+            text-align: center;
+        }
+        .toast.show {
+            opacity: 1;
+        }
+        /* 详情弹层 */
+        .modal-mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .modal-mask.show {
+            display: flex;
+        }
+        .modal {
+            background: linear-gradient(180deg, #3a2566, #1f1442);
+            border-radius: 18px;
+            width: 100%;
+            max-width: 360px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        .modal img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+        }
+        .modal-body {
+            padding: 16px 18px 20px;
+        }
+        .modal-body h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .modal-body .desc {
+            font-size: 13px;
+            color: #ccc;
+            line-height: 1.6;
+            margin: 10px 0 14px;
+        }
+        .modal-body .meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #ffb73a;
+            margin-bottom: 14px;
+        }
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #fff;
+            cursor: pointer;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <div class="toast" id="toast"></div>
+
+    <!-- 宠物详情弹层 -->
+    <div class="modal-mask" id="modalMask">
+        <div class="modal">
+            <div class="modal-close" onclick="closeModal()">×</div>
+            <img id="modalImage" src="" alt="" />
+            <div class="modal-body">
+                <h3>
+                    <span id="modalName"></span>
+                    <span class="attr-tag" id="modalAttr"></span>
+                    <span class="quality-tag" id="modalQuality"></span>
+                </h3>
+                <div class="meta">
+                    <span>需要积分：<span id="modalPoints"></span></span>
+                    <span id="modalStatus"></span>
+                </div>
+                <div class="desc" id="modalDesc"></div>
+                <button class="unlock-btn" id="modalBtn"></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============ 配置 ============
+        // 后端 API 基础地址（与 admin 一致，如 http://localhost:8004/adminapi）
+        // 实际部署时通过环境变量或构建注入
+        const API_BASE = (window.GAME_CONFIG && window.GAME_CONFIG.apiBase) || '/adminapi'
+        // 当前用户 token（实际由登录流程写入 localStorage）
+        const TOKEN_KEY = 'game_token'
+
+        // ============ 状态 ============
+        const state = {
+            points: 0,
+            pets: [],
+            unlockedIds: new Set(),
+            filter: 'all',
+            loading: true
+        }
+
+        // ============ 工具函数 ============
+        function getToken() {
+            return localStorage.getItem(TOKEN_KEY) || ''
+        }
+        function setToken(t) {
+            localStorage.setItem(TOKEN_KEY, t)
+        }
+        async function request(path, options = {}) {
+            const headers = { 'Content-Type': 'application/json' }
+            const token = getToken()
+            if (token) headers['token'] = token
+            const res = await fetch(API_BASE + path, {
+                method: options.method || 'GET',
+                headers,
+                body: options.body ? JSON.stringify(options.body) : undefined
+            })
+            const data = await res.json().catch(() => ({}))
+            if (data.code === -1) {
+                toast('登录已失效，请重新登录')
+                throw new Error('unauthorized')
+            }
+            if (data.code !== 1) {
+                toast(data.msg || '请求失败')
+                throw new Error(data.msg || 'request failed')
+            }
+            return data.data
+        }
+        function toast(msg) {
+            const el = document.getElementById('toast')
+            el.textContent = msg
+            el.classList.add('show')
+            clearTimeout(toast._t)
+            toast._t = setTimeout(() => el.classList.remove('show'), 2000)
+        }
+        const ATTR_TEXT = { fire: '火', water: '水', wood: '木', light: '光', dark: '暗' }
+        const QUALITY_TEXT = ['', '普通', '稀有', '史诗', '传说']
+
+        // ============ API ============
+        async function fetchPets() {
+            const data = await request('/promote.pet/lists', {
+                method: 'POST',
+                body: { page_no: 1, page_size: 100 }
+            })
+            state.pets = (data.lists || []).filter((p) => p.status == 1)
+        }
+        async function fetchUserInfo() {
+            // 获取用户积分与已解锁宠物列表
+            const data = await request('/promote.pet/userPets', { method: 'POST' })
+            state.points = data.points || 0
+            state.unlockedIds = new Set((data.unlocked || []).map((p) => p.id))
+        }
+        async function unlockPet(id) {
+            await request('/promote.pet/unlock', { method: 'POST', body: { id } })
+            toast('解锁成功！')
+            await fetchUserInfo()
+            render()
+        }
+
+        // ============ 渲染 ============
+        function render() {
+            const app = document.getElementById('app')
+            if (state.loading) {
+                app.innerHTML =
+                    '<div class="loading"><div class="spinner"></div>加载中...</div>'
+                return
+            }
+            const filtered =
+                state.filter === 'all'
+                    ? state.pets
+                    : state.pets.filter((p) => p.attribute === state.filter)
+
+            const filterChips = `
+                <div class="filter-bar">
+                    <div class="filter-chip ${state.filter === 'all' ? 'active' : ''}" data-filter="all">全部</div>
+                    <div class="filter-chip ${state.filter === 'fire' ? 'active' : ''}" data-filter="fire">火</div>
+                    <div class="filter-chip ${state.filter === 'water' ? 'active' : ''}" data-filter="water">水</div>
+                    <div class="filter-chip ${state.filter === 'wood' ? 'active' : ''}" data-filter="wood">木</div>
+                    <div class="filter-chip ${state.filter === 'light' ? 'active' : ''}" data-filter="light">光</div>
+                    <div class="filter-chip ${state.filter === 'dark' ? 'active' : ''}" data-filter="dark">暗</div>
+                </div>`
+
+            const cards = filtered
+                .map((p) => {
+                    const unlocked = state.unlockedIds.has(p.id)
+                    const canUnlock = !unlocked && state.points >= (p.points || 0)
+                    const btnClass = unlocked ? 'done' : canUnlock ? 'can' : 'cant'
+                    const btnText = unlocked
+                        ? '已解锁'
+                        : canUnlock
+                        ? '解锁'
+                        : `需 ${p.points} 积分`
+                    return `
+                    <div class="pet-card ${unlocked ? '' : 'locked'}" data-id="${p.id}">
+                        ${unlocked ? '' : '<div class="lock-mask">🔒</div>'}
+                        <img class="pet-image" src="${p.image || ''}" alt="${p.name}" />
+                        <div class="pet-info">
+                            <div class="pet-name">
+                                ${p.name}
+                                <span class="attr-tag attr-${p.attribute}">${ATTR_TEXT[p.attribute] || '?'}</span>
+                            </div>
+                            <div>
+                                <span class="quality-tag quality-${p.quality}">${QUALITY_TEXT[p.quality] || '普通'}</span>
+                            </div>
+                            <div class="pet-points ${unlocked ? '' : 'locked-cost'}">
+                                ${unlocked ? '已拥有' : '需要 ' + (p.points || 0) + ' 积分'}
+                            </div>
+                            <button class="unlock-btn ${btnClass}" data-action="${unlocked ? 'view' : canUnlock ? 'unlock' : 'view'}" data-id="${p.id}">
+                                ${btnText}
+                            </button>
+                        </div>
+                    </div>`
+                })
+                .join('')
+
+            app.innerHTML = `
+                <div class="header">
+                    <div class="title">🐾 宠物图鉴</div>
+                    <div class="points-box">
+                        <span class="icon">⭐</span>
+                        <span>${state.points}</span>
+                    </div>
+                </div>
+                ${filterChips}
+                <div class="pet-grid">
+                    ${cards || '<div class="empty">暂无宠物</div>'}
+                </div>`
+
+            // 绑定事件
+            app.querySelectorAll('.filter-chip').forEach((el) => {
+                el.addEventListener('click', () => {
+                    state.filter = el.dataset.filter
+                    render()
+                })
+            })
+            app.querySelectorAll('.unlock-btn').forEach((el) => {
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation()
+                    const id = Number(el.dataset.id)
+                    const action = el.dataset.action
+                    if (action === 'unlock') handleUnlock(id)
+                    else openModal(id)
+                })
+            })
+            app.querySelectorAll('.pet-card').forEach((el) => {
+                el.addEventListener('click', () => openModal(Number(el.dataset.id)))
+            })
+        }
+
+        async function handleUnlock(id) {
+            const pet = state.pets.find((p) => p.id === id)
+            if (!pet) return
+            if (state.points < (pet.points || 0)) {
+                toast('积分不足')
+                return
+            }
+            if (!confirm(`确定消耗 ${pet.points} 积分解锁「${pet.name}」？`)) return
+            try {
+                await unlockPet(id)
+            } catch (e) {
+                /* 错误已 toast */
+            }
+        }
+
+        // ============ 详情弹层 ============
+        function openModal(id) {
+            const p = state.pets.find((x) => x.id === id)
+            if (!p) return
+            const unlocked = state.unlockedIds.has(p.id)
+            const canUnlock = !unlocked && state.points >= (p.points || 0)
+            document.getElementById('modalImage').src = p.image || ''
+            document.getElementById('modalName').textContent = p.name
+            const attrEl = document.getElementById('modalAttr')
+            attrEl.textContent = ATTR_TEXT[p.attribute] || '?'
+            attrEl.className = 'attr-tag attr-' + p.attribute
+            const qEl = document.getElementById('modalQuality')
+            qEl.textContent = QUALITY_TEXT[p.quality] || '普通'
+            qEl.className = 'quality-tag quality-' + p.quality
+            document.getElementById('modalPoints').textContent = p.points || 0
+            document.getElementById('modalStatus').textContent = unlocked
+                ? '✅ 已解锁'
+                : canUnlock
+                ? '可解锁'
+                : '积分不足'
+            document.getElementById('modalDesc').textContent = p.remark || '暂无描述'
+            const btn = document.getElementById('modalBtn')
+            if (unlocked) {
+                btn.textContent = '已拥有'
+                btn.className = 'unlock-btn done'
+                btn.onclick = closeModal
+            } else if (canUnlock) {
+                btn.textContent = `解锁（消耗 ${p.points} 积分）`
+                btn.className = 'unlock-btn can'
+                btn.onclick = async () => {
+                    closeModal()
+                    await handleUnlock(id)
+                }
+            } else {
+                btn.textContent = `还需 ${p.points - state.points} 积分`
+                btn.className = 'unlock-btn cant'
+                btn.onclick = closeModal
+            }
+            document.getElementById('modalMask').classList.add('show')
+        }
+        function closeModal() {
+            document.getElementById('modalMask').classList.remove('show')
+        }
+        document.getElementById('modalMask').addEventListener('click', (e) => {
+            if (e.target.id === 'modalMask') closeModal()
+        })
+
+        // ============ 初始化 ============
+        async function init() {
+            state.loading = true
+            render()
+            try {
+                await Promise.all([fetchPets(), fetchUserInfo()])
+            } catch (e) {
+                console.error(e)
+            } finally {
+                state.loading = false
+                render()
+            }
+        }
+        init()
+    </script>
+</body>
+</html>
