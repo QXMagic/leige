@@ -16,3 +16,20 @@ export function petDelete(params: any) {
 export function petDetail(params: any) {
     return request.get({ url: '/game.pet/detail', params })
 }
+
+/** ============ 学生资料 ============ */
+export function studentLists(params: any) {
+    return request.get({ url: '/game.student/lists', params })
+}
+export function studentAdd(params: any) {
+    return request.post({ url: '/game.student/add', params })
+}
+export function studentEdit(params: any) {
+    return request.post({ url: '/game.student/edit', params })
+}
+export function studentDelete(params: any) {
+    return request.post({ url: '/game.student/delete', params })
+}
+export function studentDetail(params: any) {
+    return request.get({ url: '/game.student/detail', params })
+}
