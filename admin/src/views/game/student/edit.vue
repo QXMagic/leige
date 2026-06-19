@@ -13,7 +13,8 @@
                     <el-input v-model="formData.name" placeholder="如 小明" clearable />
                 </el-form-item>
                 <el-form-item label="头像">
-                    <material-picker v-model="formData.avatar" :limit="1" />
+                    <material-picker v-model="formData.avatar" :limit="1" @change="onAvatarChange" />
+                    <div class="form-tips">仅支持正方形图片(宽=高),否则游戏端显示会被压扁</div>
                 </el-form-item>
                 <el-form-item label="学号" prop="student_no">
                     <el-input v-model="formData.student_no" placeholder="选填" clearable />
@@ -49,6 +50,8 @@
 import type { FormInstance } from 'element-plus'
 import { studentAdd, studentDetail, studentEdit } from '@/api/game'
 import Popup from '@/components/popup/index.vue'
+import feedback from '@/utils/feedback'
+import { isSquareImage } from '@/utils/util'
 
 const emit = defineEmits(['success', 'close'])
 const formRef = shallowRef<FormInstance>()
@@ -73,8 +76,26 @@ const formRules = {
     name: [{ required: true, message: '请输入学生姓名', trigger: 'blur' }]
 }
 
+// 选择头像后立刻校验是否为正方形,非正方形清空并提示
+const onAvatarChange = async (url: string) => {
+    if (!url) return
+    const ok = await isSquareImage(url)
+    if (!ok) {
+        feedback.msgError('学生头像必须是正方形图片(宽=高),请重新选择')
+        formData.avatar = ''
+    }
+}
+
 const handleSubmit = async () => {
     await formRef.value?.validate()
+    // 提交前再做一次兜底校验,防止用户绕过 onChange(如直接编辑已有非正方形旧数据后直接保存)
+    if (formData.avatar) {
+        const ok = await isSquareImage(formData.avatar)
+        if (!ok) {
+            feedback.msgError('学生头像必须是正方形图片(宽=高),请重新选择')
+            return
+        }
+    }
     mode.value == 'edit' ? await studentEdit(formData) : await studentAdd(formData)
     popupRef.value?.close()
     emit('success')

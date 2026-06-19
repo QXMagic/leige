@@ -13,7 +13,8 @@
                     <el-input v-model="formData.name" placeholder="如 小龙" clearable />
                 </el-form-item>
                 <el-form-item label="图片">
-                    <material-picker v-model="formData.image" :limit="1" />
+                    <material-picker v-model="formData.image" :limit="1" @change="onImageChange" />
+                    <div class="form-tips">仅支持正方形图片(宽=高),否则游戏端显示会被压扁</div>
                 </el-form-item>
                 <el-form-item label="品质" prop="quality">
                     <el-select v-model="formData.quality">
@@ -67,6 +68,8 @@
 import type { FormInstance } from 'element-plus'
 import { petAdd, petDetail, petEdit } from '@/api/game'
 import Popup from '@/components/popup/index.vue'
+import feedback from '@/utils/feedback'
+import { isSquareImage } from '@/utils/util'
 
 const emit = defineEmits(['success', 'close'])
 const formRef = shallowRef<FormInstance>()
@@ -94,8 +97,26 @@ const formRules = {
     quality: [{ required: true, message: '请选择品质', trigger: 'change' }]
 }
 
+// 选择宠物图片后立刻校验是否为正方形,非正方形清空并提示
+const onImageChange = async (url: string) => {
+    if (!url) return
+    const ok = await isSquareImage(url)
+    if (!ok) {
+        feedback.msgError('宠物图片必须是正方形图片(宽=高),请重新选择')
+        formData.image = ''
+    }
+}
+
 const handleSubmit = async () => {
     await formRef.value?.validate()
+    // 提交前再做一次兜底校验,防止用户绕过 onChange(如直接编辑已有非正方形旧数据后直接保存)
+    if (formData.image) {
+        const ok = await isSquareImage(formData.image)
+        if (!ok) {
+            feedback.msgError('宠物图片必须是正方形图片(宽=高),请重新选择')
+            return
+        }
+    }
     mode.value == 'edit' ? await petEdit(formData) : await petAdd(formData)
     popupRef.value?.close()
     emit('success')

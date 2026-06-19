@@ -217,3 +217,40 @@ export const calcColor = (color: string, opacity: number): string => {
     // 返回转换后的 rgba 颜色值
     return `rgba(${r}, ${g}, ${b}, ${opacity})`
 }
+
+/**
+ * @description 加载图片获取宽高
+ * @param {string} url 图片地址(支持远程 URL 或 dataURL)
+ * @returns {Promise<{width:number,height:number}>} 解析为图片自然宽高
+ */
+export const getImageSize = (url: string): Promise<{ width: number; height: number }> => {
+    return new Promise((resolve, reject) => {
+        if (!url) {
+            reject(new Error('图片地址为空'))
+            return
+        }
+        const img = new Image()
+        // 跨域时不取像素，仅读取尺寸,加上 crossOrigin 防止部分 CDN 报错
+        img.crossOrigin = 'anonymous'
+        img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight })
+        img.onerror = () => reject(new Error('图片加载失败'))
+        img.src = url
+    })
+}
+
+/**
+ * @description 校验图片是否为正方形(允许少量像素误差,常见的 1024x1023 这类裁切误差不会被误判)
+ * @param {string} url 图片地址
+ * @param {number} tolerance 允许的宽高像素差,默认 2 像素
+ * @returns {Promise<boolean>} true 表示是正方形
+ */
+export const isSquareImage = async (url: string, tolerance = 2): Promise<boolean> => {
+    try {
+        const { width, height } = await getImageSize(url)
+        if (!width || !height) return false
+        return Math.abs(width - height) <= tolerance
+    } catch (e) {
+        // 加载失败时不阻塞用户(由其他地方提示),按"非正方形"处理避免误放行
+        return false
+    }
+}
