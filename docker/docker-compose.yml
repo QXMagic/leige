@@ -1,0 +1,39 @@
+name: leige
+
+networks:
+  leige:
+    driver: bridge
+
+services:
+
+  nginx:
+    container_name: leige-nginx
+    image: registry.cn-shanghai.aliyuncs.com/xinyu126/php:nginx128
+    restart: always
+    depends_on:
+      - "php"
+    volumes:
+      - ../server:/app/server
+      - ./config/nginx/conf.d:/etc/nginx/conf.d
+      - ./log/nginx/logs:/logs
+    networks:
+      - leige
+    ports:
+      - "8004:80"
+
+
+
+
+  php:
+    container_name: leige-php
+    image: registry.cn-shanghai.aliyuncs.com/xinyu126/php:83-fpm-260129 
+    restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    working_dir: /app/server
+    volumes:
+      - ../server:/app/server
+    networks:
+      - leige
+    
+    #user: "1000:1000"
