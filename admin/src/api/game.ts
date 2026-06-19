@@ -33,3 +33,23 @@ export function studentDelete(params: any) {
 export function studentDetail(params: any) {
     return request.get({ url: '/game.student/detail', params })
 }
+
+/** ============ 进化路线 ============ */
+export function evolutionLists(params: any) {
+    return request.get({ url: '/game.evolution/lists', params })
+}
+export function evolutionAll() {
+    return request.get({ url: '/game.evolution/all' })
+}
+export function evolutionAdd(params: any) {
+    return request.post({ url: '/game.evolution/add', params })
+}
+export function evolutionEdit(params: any) {
+    return request.post({ url: '/game.evolution/edit', params })
+}
+export function evolutionDelete(params: any) {
+    return request.post({ url: '/game.evolution/delete', params })
+}
+export function evolutionDetail(params: any) {
+    return request.get({ url: '/game.evolution/detail', params })
+}

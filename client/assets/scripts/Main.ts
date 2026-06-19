@@ -5,6 +5,7 @@ import { UIManager, UICallbacks } from './UI/UIManager';
 import { RealApiService } from './Api/RealApiService';
 import { PetApiService } from './Api/PetApiService';
 import { PetGalleryPanel } from './Pet/PetGalleryPanel';
+import { EvolutionChoicePanel } from './Pet/EvolutionChoicePanel';
 import { EffectManager } from './Effect/EffectManager';
 import { StoryManager } from './Story/StoryManager';
 import { UpgradePathManager } from './UpgradePath/UpgradePathManager';
@@ -17,6 +18,7 @@ export class Main extends Component {
     private api: RealApiService = new RealApiService();
     private petApi: PetApiService = new PetApiService();
     private galleryPanel: PetGalleryPanel | null = null;
+    private evolutionPanel: EvolutionChoicePanel | null = null;
     private petManager: PetManager | null = null;
     private uiManager: UIManager | null = null;
     private effectManager: EffectManager | null = null;
@@ -116,6 +118,7 @@ export class Main extends Component {
     private setupPetGallery(): void {
         const root = this.canvasNode || this.node;
         this.galleryPanel = new PetGalleryPanel(root, this.petApi);
+        this.evolutionPanel = new EvolutionChoicePanel(root);
 
         const btn = new Node('GalleryButton');
         root.addChild(btn);
@@ -155,6 +158,33 @@ export class Main extends Component {
         }
     }
 
+    /**
+     * 宠物经验达标且存在多个进化方向时,弹出分支选择面板;玩家选择后调用服务端进化接口。
+     */
+    private maybePromptEvolution(pet: PetData | null): void {
+        if (!pet || !pet.pendingEvolution || !this.evolutionPanel) return;
+        const options = pet.evolutionOptions || [];
+        if (options.length < 2) return;
+        if (this.evolutionPanel.isOpen()) return;
+        this.evolutionPanel.open(options, (key: string) => this.onChooseEvolution(key));
+    }
+
+    private async onChooseEvolution(nextKey: string): Promise<void> {
+        if (!this.currentStudentId || !this.uiManager) return;
+        const res = await this.api.evolvePet(this.currentStudentId, nextKey);
+        if (res.code === 0 && res.data) {
+            this.currentPetData = res.data;
+            this.syncPetToManager(res.data);
+            if (this.effectManager) {
+                this.effectManager.playEvolution(0, -30);
+            }
+            this.uiManager.showToast(`进化成功！宠物进化为【${res.data.stageName || ''}】`);
+        } else {
+            this.uiManager.showToast(res.message || '进化失败');
+        }
+        this.updateUI();
+    }
+
     update(dt: number) {
         if (this.petManager) {
             this.petManager.update(dt);
@@ -174,6 +204,7 @@ export class Main extends Component {
             this.currentPetData = res.data;
             this.syncPetToManager(res.data);
             this.updateUI();
+            this.maybePromptEvolution(res.data);
         } else {
             this.currentPetData = null;
             if (this.uiManager) {
@@ -233,6 +264,7 @@ export class Main extends Component {
             } else {
                 this.uiManager.showToast(`喂食成功！获得 ${expGained} 经验值`);
             }
+            this.maybePromptEvolution(this.currentPetData);
         } else {
             this.uiManager.showToast(res.message || '喂食失败');
         }
@@ -251,6 +283,7 @@ export class Main extends Component {
             if (pet) {
                 this.currentPetData = pet;
                 this.syncPetToManager(pet);
+                this.maybePromptEvolution(pet);
             }
         } else {
             this.uiManager.showToast(res.message || '购买失败');

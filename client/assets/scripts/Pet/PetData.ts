@@ -97,6 +97,27 @@ export interface PetData {
     upgradePathId: string | null;
     createdAt: string;
     updatedAt: string;
+    // 进化路线状态(服务端 GameLogic 提供)
+    evolutionPathId?: number;
+    currentNodeKey?: string;
+    stageName?: string;
+    stageImage?: string | null;
+    expRequired?: number;
+    stageAttributes?: { attack: number; defense: number; speed: number; hp: number } | null;
+    pendingEvolution?: boolean;
+    evolutionOptions?: EvolutionOption[];
+}
+
+/** 进化分支候选(待选择进化方向时) */
+export interface EvolutionOption {
+    key: string;
+    name: string;
+    image: string;
+    stage: number;
+    attack: number;
+    defense: number;
+    speed: number;
+    hp: number;
 }
 
 export interface FoodItemData {

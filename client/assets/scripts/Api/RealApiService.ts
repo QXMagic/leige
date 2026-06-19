@@ -157,6 +157,16 @@ export class RealApiService {
         return this.petAction(studentId, 'feed');
     }
 
+    /** 选择分支进化方向 */
+    async evolvePet(studentId: string, nextKey: string): Promise<ApiResponse<PetData>> {
+        const g = await this.guard(); if (g) return g as any;
+        const res = await this.http.request<PetData>('POST', '/game/petEvolve', { student_id: studentId, next_key: nextKey });
+        if (!res.ok || !res.data) return this.err(res.msg) as any;
+        this.data.pets[studentId] = res.data;
+        this.data.diamonds[studentId] = res.data.diamond;
+        return this.ok(res.data);
+    }
+
     async uploadPetImage(studentId: string, imageDataUrl: string): Promise<ApiResponse<{ url: string }>> {
         const g = await this.guard(); if (g) return g as any;
         const res = await this.http.request<any>('POST', '/game/petUploadImage', { student_id: studentId, imageUrl: imageDataUrl });

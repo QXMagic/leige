@@ -50,6 +50,20 @@
                         <div class="form-tips">用户能量(积分)达到该值即可解锁，0 表示默认解锁</div>
                     </div>
                 </el-form-item>
+                <el-form-item label="进化路线">
+                    <div class="w-full">
+                        <el-select v-model="formData.evolution_path_id" class="w-[260px]" clearable placeholder="默认进化路线">
+                            <el-option :value="0" label="默认进化路线" />
+                            <el-option
+                                v-for="p in pathOptions"
+                                :key="p.id"
+                                :value="p.id"
+                                :label="p.name + (p.is_default ? '（默认）' : '')"
+                            />
+                        </el-select>
+                        <div class="form-tips">宠物的进化阶段与等级数据在「进化路线」中配置，0=使用默认</div>
+                    </div>
+                </el-form-item>
                 <el-form-item label="排序">
                     <el-input-number v-model="formData.sort" :min="0" />
                 </el-form-item>
@@ -66,10 +80,16 @@
 
 <script lang="ts" setup>
 import type { FormInstance } from 'element-plus'
-import { petAdd, petDetail, petEdit } from '@/api/game'
+import { petAdd, petDetail, petEdit, evolutionAll } from '@/api/game'
 import Popup from '@/components/popup/index.vue'
 import feedback from '@/utils/feedback'
 import { isSquareImage } from '@/utils/util'
+
+const pathOptions = ref<any[]>([])
+const loadPaths = async () => {
+    pathOptions.value = (await evolutionAll()) || []
+}
+onMounted(loadPaths)
 
 const emit = defineEmits(['success', 'close'])
 const formRef = shallowRef<FormInstance>()
@@ -87,6 +107,7 @@ const formData = reactive({
     speed: 0,
     hp: 0,
     unlock_energy: 0,
+    evolution_path_id: 0,
     sort: 0,
     status: 1,
     remark: ''
