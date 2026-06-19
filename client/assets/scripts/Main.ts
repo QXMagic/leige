@@ -1,8 +1,10 @@
-import { _decorator, Component, Node, Vec3, Canvas, UITransform, view, Camera, Widget } from 'cc';
+import { _decorator, Component, Node, Vec3, Canvas, UITransform, view, Camera, Widget, Label, Color, Graphics, Button } from 'cc';
 import { PetManager } from './Pet/PetManager';
 import { PetType, GAME_SAVE_KEY, PET_DEFINITIONS, StudentData, PetData, GrowthStage } from './Pet/PetData';
 import { UIManager, UICallbacks } from './UI/UIManager';
 import { MockApiService } from './Api/MockApiService';
+import { PetApiService } from './Api/PetApiService';
+import { PetGalleryPanel } from './Pet/PetGalleryPanel';
 import { EffectManager } from './Effect/EffectManager';
 import { StoryManager } from './Story/StoryManager';
 import { UpgradePathManager } from './UpgradePath/UpgradePathManager';
@@ -13,6 +15,8 @@ const { ccclass } = _decorator;
 @ccclass('Main')
 export class Main extends Component {
     private api: MockApiService = new MockApiService();
+    private petApi: PetApiService = new PetApiService();
+    private galleryPanel: PetGalleryPanel | null = null;
     private petManager: PetManager | null = null;
     private uiManager: UIManager | null = null;
     private effectManager: EffectManager | null = null;
@@ -100,6 +104,54 @@ export class Main extends Component {
         this.isLoggedIn = true;
         if (this.isLoggedIn) {
             this.uiManager.showTeacherPanel();
+        }
+
+        this.setupPetGallery();
+    }
+
+    /**
+     * 宠物图鉴入口:右上角悬浮「图鉴」按钮,点击拉取后台配置的宠物并支持按积分解锁。
+     * 图鉴数据走真实接口(PetApiService -> 服务端 /api/pet/*),与本地 MockApiService 互不影响。
+     */
+    private setupPetGallery(): void {
+        const root = this.canvasNode || this.node;
+        this.galleryPanel = new PetGalleryPanel(root, this.petApi);
+
+        const btn = new Node('GalleryButton');
+        root.addChild(btn);
+        btn.setPosition(400, 280, 0);
+        btn.addComponent(UITransform).setContentSize(96, 40);
+        const g = btn.addComponent(Graphics);
+        g.fillColor = new Color(165, 94, 234, 255);
+        g.roundRect(-48, -20, 96, 40, 12);
+        g.fill();
+
+        const lblNode = new Node('Lbl');
+        btn.addChild(lblNode);
+        lblNode.addComponent(UITransform).setContentSize(96, 40);
+        const lbl = lblNode.addComponent(Label);
+        lbl.string = '🐾 图鉴';
+        lbl.fontSize = 18;
+        lbl.color = new Color(255, 255, 255, 255);
+        lbl.horizontalAlign = Label.HorizontalAlign.CENTER;
+        lbl.verticalAlign = Label.VerticalAlign.CENTER;
+
+        const button = btn.addComponent(Button);
+        button.transition = Button.Transition.SCALE;
+        button.zoomScale = 1.06;
+        button.duration = 0.08;
+        btn.on(Node.EventType.TOUCH_END, (ev: any) => {
+            ev.propagationStopped = true;
+            this.openPetGallery();
+        }, this);
+    }
+
+    private openPetGallery(): void {
+        if (!this.galleryPanel) return;
+        if (this.galleryPanel.isOpen()) {
+            this.galleryPanel.close();
+        } else {
+            this.galleryPanel.open();
         }
     }
 
