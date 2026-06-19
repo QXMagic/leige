@@ -1,0 +1,123 @@
+.modal-overlay {
+  position:fixed; top:0; left:0; right:0; bottom:0;
+  background:rgba(0,0,0,0.5);
+  display:none; align-items:center; justify-content:center;
+  z-index:1000;
+  backdrop-filter:blur(4px);
+}
+
+.modal-overlay.show { display:flex; }
+
+.modal {
+  background:#fff;
+  border-radius:20px;
+  padding:28px;
+  max-width:480px;
+  width:90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  animation: modalIn 0.3s ease;
+}
+
+.modal .modal-title {
+  font-size:20px; font-weight:800;
+  margin-bottom:16px;
+  text-align:center;
+}
+
+.modal .modal-body { margin-bottom:18px; }
+
+.modal .modal-actions {
+  display:flex; gap:10px; justify-content:center;
+}
+
+.modal-input {
+  width:100%;
+  padding:14px 16px;
+  border:3px solid rgba(0,0,0,0.1);
+  border-radius:12px;
+  font-size:18px;
+  font-family:inherit;
+  text-align:center;
+  outline:none;
+  transition: border-color 0.2s;
+}
+
+.modal-input:focus { border-color: var(--primary); }
+
+.pet-type-selector {
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:10px;
+}
+
+.pet-type-option {
+  display:flex; flex-direction:column; align-items:center;
+  padding:14px 8px;
+  background:var(--bg);
+  border-radius:14px;
+  cursor:pointer;
+  transition:all 0.2s;
+  border:3px solid transparent;
+  font-family:inherit;
+}
+
+.pet-type-option:active { transform:scale(0.95); }
+.pet-type-option.selected { border-color:var(--primary); background:rgba(255,107,107,0.08); }
+
+.pet-type-option .pto-emoji { font-size:40px; margin-bottom:6px; }
+.pet-type-option .pto-name { font-size:14px; font-weight:700; color:var(--dark); }
+.pet-type-option .pto-evo { font-size:11px; color:var(--text-light); margin-top:2px; }
+
+.settings-modal .setting-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 0;
+  border-bottom:1px solid rgba(0,0,0,0.06);
+}
+
+.settings-modal .setting-row:last-child { border:none; }
+
+.settings-modal .setting-label { font-size:14px; font-weight:600; }
+
+.settings-modal .setting-input {
+  padding:8px 12px;
+  border:2px solid rgba(0,0,0,0.1);
+  border-radius:8px;
+  font-size:14px;
+  width:100px;
+  text-align:center;
+  font-family:inherit;
+}
+
+.confirm-modal .confirm-msg {
+  font-size:16px;
+  text-align:center;
+  padding:12px 0;
+  color:var(--dark);
+  line-height:1.6;
+}
+
+.level-up-overlay {
+  position:fixed; top:0; left:0; right:0; bottom:0;
+  display:none; align-items:center; justify-content:center;
+  z-index:2000;
+  background:rgba(0,0,0,0.6);
+  backdrop-filter:blur(8px);
+}
+
+.level-up-overlay.show { display:flex; }
+
+.level-up-card {
+  background: linear-gradient(135deg, #FF6B6B, #FFE66D);
+  border-radius:24px;
+  padding:36px;
+  text-align:center;
+  animation: levelUpBounce 0.6s cubic-bezier(0.68,-0.55,0.265,1.55);
+  box-shadow: 0 20px 60px rgba(255,107,107,0.4);
+  max-width:400px;
+  width:80%;
+}
+
+.level-up-card .lu-emoji { font-size:72px; margin-bottom:10px; }
+.level-up-card .lu-title { font-size:26px; font-weight:900; color:#fff; text-shadow:0 2px 4px rgba(0,0,0,0.2); }
+.level-up-card .lu-subtitle { font-size:15px; color:rgba(255,255,255,0.9); margin-top:6px; }
+.level-up-card .lu-new-emoji { font-size:56px; margin-top:10px; animation: luSpin 1s ease-in-out; }
