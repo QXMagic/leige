@@ -4,6 +4,7 @@ import {
     Layers, VerticalTextAlignment, ScrollView, Layout
 } from 'cc';
 import { FoodItemData, PetType, PET_DEFINITIONS, MEDAL_DEFINITIONS, SHOP_ITEMS, ShopItemData, MedalData, PlayerMedalData, GrowthStage, StudentData, PetData, UpgradePath } from '../Pet/PetData';
+import { Theme } from './Theme';
 import { EffectManager } from '../Effect/EffectManager';
 
 export interface UICallbacks {
@@ -146,6 +147,8 @@ export class UIManager {
         this.createAddStudentPanel();
         this.createCreatePetPanel();
         this.createToast();
+        // 皮肤注入后,一次性把自定义字体刷到所有 Label(未注入字体则无操作)
+        Theme.applyFontToTree(this.rootNode);
     }
 
     getPenguinArea(): Node {
@@ -2344,23 +2347,34 @@ export class UIManager {
         const btnNode = new Node(text);
         parent.addChild(btnNode);
         btnNode.setPosition(x, y, 0);
-        const t = btnNode.addComponent(UITransform);
-        t.setContentSize(w, h);
-        const g = btnNode.addComponent(Graphics);
-        g.fillColor = color;
-        g.roundRect(-w / 2, -h / 2, w, h, 12);
-        g.fill();
-        g.strokeColor = new Color(
-            Math.max(color.r - 40, 0),
-            Math.max(color.g - 40, 0),
-            Math.max(color.b - 40, 0), 80
-        );
-        g.lineWidth = 1;
-        g.roundRect(-w / 2, -h / 2, w, h, 12);
-        g.stroke();
+        btnNode.addComponent(UITransform).setContentSize(w, h);
 
+        const skin = Theme.skin();
         const brightness = (color.r + color.g + color.b) / 3;
         const isLight = brightness > 160;
+
+        if (skin.button) {
+            // 有皮肤:九宫格按钮底图,按语义色 tint(一张图复用出多种按钮)
+            const sp = btnNode.addComponent(Sprite);
+            sp.spriteFrame = skin.button;
+            sp.type = Sprite.Type.SLICED;
+            sp.sizeMode = Sprite.SizeMode.CUSTOM;
+            sp.color = color;
+        } else {
+            // 无皮肤:回退到原来的代码绘制(行为完全不变)
+            const g = btnNode.addComponent(Graphics);
+            g.fillColor = color;
+            g.roundRect(-w / 2, -h / 2, w, h, Theme.radius('md'));
+            g.fill();
+            g.strokeColor = new Color(
+                Math.max(color.r - 40, 0),
+                Math.max(color.g - 40, 0),
+                Math.max(color.b - 40, 0), 80
+            );
+            g.lineWidth = 1;
+            g.roundRect(-w / 2, -h / 2, w, h, Theme.radius('md'));
+            g.stroke();
+        }
 
         const lblNode = new Node('Lbl');
         btnNode.addChild(lblNode);
@@ -2368,15 +2382,24 @@ export class UIManager {
         const lbl = lblNode.addComponent(Label);
         lbl.string = text;
         lbl.fontSize = 18;
-        lbl.color = isLight ? new Color(40, 44, 52, 255) : new Color(255, 255, 255, 255);
+        lbl.color = skin.button ? new Color(255, 255, 255, 255) : (isLight ? new Color(40, 44, 52, 255) : new Color(255, 255, 255, 255));
         lbl.horizontalAlign = Label.HorizontalAlign.CENTER;
         lbl.verticalAlign = Label.VerticalAlign.CENTER;
         lbl.overflow = Label.Overflow.CLAMP;
+        if (skin.uiFont) lbl.font = skin.uiFont;
 
         const btn = btnNode.addComponent(Button);
-        btn.transition = Button.Transition.SCALE;
-        btn.zoomScale = 1.05;
-        btn.duration = 0.08;
+        if (skin.button && skin.buttonPressed) {
+            // 皮肤按下态:用 Sprite 过渡
+            btn.transition = Button.Transition.SPRITE;
+            btn.normalSprite = skin.button;
+            btn.pressedSprite = skin.buttonPressed;
+            btn.hoverSprite = skin.button;
+        } else {
+            btn.transition = Button.Transition.SCALE;
+            btn.zoomScale = 1.05;
+            btn.duration = 0.08;
+        }
 
         btnNode.on(Node.EventType.TOUCH_END, (ev: any) => {
             ev.propagationStopped = true;
