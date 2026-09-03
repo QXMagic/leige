@@ -1,0 +1,114 @@
+[gd_scene format=3 uid="uid://creld72558ok5"]
+
+[ext_resource type="Script" uid="uid://c217ro1pyltul" path="res://scenes/loading/Loading.gd" id="1_riwwi"]
+[ext_resource type="Texture2D" uid="uid://bwqjw01qlnok0" path="res://resource/sprites/illustration.png" id="2_memlh"]
+[ext_resource type="Texture2D" uid="uid://cdyrxmrbu6k63" path="res://resource/ui/shadow.png" id="3_t854e"]
+[ext_resource type="Script" uid="uid://b5n4jpeg4vwc6" path="res://scenes/pet/PetView.gd" id="4_b1bhb"]
+[ext_resource type="Texture2D" uid="uid://c2lrx18cnpaeo" path="res://resource/ui/bg_grid.png" id="5_i78xl"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_riwwi"]
+bg_color = Color(0.6392157, 0.7411765, 0.36078432, 1)
+border_width_top = 5
+border_color = Color(0.7372549, 0.827451, 0.46666667, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[node name="Loading" type="Control" unique_id=1257976855]
+layout_mode = 3
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_riwwi")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1518075703]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = ExtResource("2_memlh")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Dim" type="ColorRect" parent="." unique_id=1062717501]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.2, 0.11, 0.06, 0.45)
+
+[node name="Title" type="Label" parent="." unique_id=926363637]
+layout_mode = 0
+offset_left = 310.0
+offset_top = 286.0
+offset_right = 1610.0
+offset_bottom = 406.0
+theme_override_colors/font_color = Color(0.9529412, 0.827451, 0.6901961, 1)
+theme_override_colors/font_shadow_color = Color(0.3, 0.15, 0.06, 0.5)
+theme_override_colors/font_outline_color = Color(0.5411765, 0.30980393, 0.17254902, 1)
+theme_override_constants/shadow_offset_y = 5
+theme_override_constants/outline_size = 14
+theme_override_font_sizes/font_size = 88
+text = "幻兽学园"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Shadow" type="TextureRect" parent="." unique_id=303438490]
+modulate = Color(1, 1, 1, 0.35)
+layout_mode = 0
+offset_left = 896.0
+offset_top = 686.0
+offset_right = 1024.0
+offset_bottom = 720.0
+mouse_filter = 2
+texture = ExtResource("3_t854e")
+expand_mode = 1
+
+[node name="Pet" type="Control" parent="." unique_id=1123598334]
+anchors_preset = 0
+offset_left = 800.0
+offset_top = 440.0
+offset_right = 1120.0
+offset_bottom = 760.0
+mouse_filter = 2
+script = ExtResource("4_b1bhb")
+pet_type = "panda"
+target_size = 313.6
+
+[node name="BarTrack" type="NinePatchRect" parent="." unique_id=1458662874]
+self_modulate = Color(0.62, 0.5, 0.41, 1)
+layout_mode = 0
+offset_left = 660.0
+offset_top = 792.0
+offset_right = 1260.0
+offset_bottom = 838.0
+texture = ExtResource("5_i78xl")
+patch_margin_left = 30
+patch_margin_top = 30
+patch_margin_right = 30
+patch_margin_bottom = 30
+
+[node name="BarFill" type="Panel" parent="BarTrack" unique_id=669705085]
+custom_minimum_size = Vector2(36, 0)
+layout_mode = 0
+offset_left = 7.0
+offset_top = 7.0
+offset_right = 43.0
+offset_bottom = 39.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_riwwi")
+
+[node name="Percent" type="Label" parent="." unique_id=2042402944]
+layout_mode = 0
+offset_left = 660.0
+offset_top = 852.0
+offset_right = 1260.0
+offset_bottom = 892.0
+theme_override_colors/font_color = Color(0.9529412, 0.827451, 0.6901961, 1)
+theme_override_colors/font_outline_color = Color(0.5411765, 0.30980393, 0.17254902, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 30
+text = "0%"
+horizontal_alignment = 1
+vertical_alignment = 1

@@ -1,5 +1,4 @@
 extends Node
-
 # ========== Configuration ==========
 
 var base_url: String = "http://localhost:8005/api"

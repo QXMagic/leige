@@ -1,10 +1,102 @@
-[gd_scene load_steps=2 format=3 uid="uid://c1godot0000000002"]
+[gd_scene format=3 uid="uid://fb71m2cjkvqw"]
 
-[ext_resource type="Script" path="res://scenes/home/MainHome.gd" id="1"]
+[ext_resource type="Script" uid="uid://ct8fg6oi1uagq" path="res://scenes/home/MainHome.gd" id="1_atpko"]
+[ext_resource type="Texture2D" uid="uid://bwqjw01qlnok0" path="res://resource/sprites/illustration.png" id="2_snw6s"]
+[ext_resource type="Texture2D" uid="uid://bf0pb4grb10ko" path="res://resource/ui/btn_close.png" id="3_24n2f"]
+[ext_resource type="Texture2D" uid="uid://cdyrxmrbu6k63" path="res://resource/ui/shadow.png" id="3_aw3bj"]
+[ext_resource type="Script" uid="uid://b5n4jpeg4vwc6" path="res://scenes/pet/PetView.gd" id="4_npvya"]
 
-[node name="MainHome" type="Control"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_24n2f"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_aw3bj"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_npvya"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_n7yhl"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2vfet"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ysr4n"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_607vb"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_r1f8v"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_c1adn"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0kh6c"]
+
+[node name="MainHome" type="Control" unique_id=144746185]
 layout_mode = 3
-anchors_preset = 15
+anchors_preset = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = ExtResource("1")
+script = ExtResource("1_atpko")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1710514893]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = ExtResource("2_snw6s")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Shadow" type="TextureRect" parent="." unique_id=798235744]
+modulate = Color(1, 1, 1, 0.3)
+layout_mode = 0
+offset_left = 315.0
+offset_top = 882.0
+offset_right = 437.0
+offset_bottom = 914.0
+mouse_filter = 2
+texture = ExtResource("3_aw3bj")
+expand_mode = 1
+
+[node name="Pet" type="Control" parent="." unique_id=1856919629]
+anchors_preset = 0
+offset_left = 199.0
+offset_top = 684.0
+offset_right = 485.0
+offset_bottom = 970.0
+mouse_filter = 2
+script = ExtResource("4_npvya")
+pet_type = "panda"
+target_size = 280.28
+
+[node name="PetHit" type="Button" parent="." unique_id=227390963]
+layout_mode = 0
+offset_left = 300.0
+offset_top = 768.0
+offset_right = 452.0
+offset_bottom = 910.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_24n2f")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_aw3bj")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_npvya")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_n7yhl")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_2vfet")
+flat = true
+
+[node name="HouseHotspot" type="Button" parent="." unique_id=2086114768]
+layout_mode = 0
+offset_left = 701.0
+offset_top = 97.0
+offset_right = 1200.0
+offset_bottom = 455.0
+tooltip_text = "进入宠物庇护所"
+theme_override_styles/normal = SubResource("StyleBoxEmpty_ysr4n")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_607vb")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_r1f8v")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_c1adn")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_0kh6c")
+flat = true
+
+[node name="CloseButton" type="TextureButton" parent="." unique_id=461575929]
+layout_mode = 0
+offset_left = 1715.0
+offset_top = 62.0
+offset_right = 1791.0
+offset_bottom = 132.0
+texture_normal = ExtResource("3_24n2f")
+ignore_texture_size = true
+stretch_mode = 0

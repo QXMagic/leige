@@ -1,0 +1,94 @@
+[gd_scene format=3 uid="uid://big4n1ue3cs2v"]
+
+[ext_resource type="Script" uid="uid://cg6d6y2kkoc8y" path="res://scenes/common/AdoptSlot.gd" id="1_o5xss"]
+[ext_resource type="Script" uid="uid://cr8e4nmgrlcrm" path="res://scenes/common/Nest.gd" id="2_s73b6"]
+[ext_resource type="Script" uid="uid://b5n4jpeg4vwc6" path="res://scenes/pet/PetView.gd" id="3_08mrj"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o5xss"]
+bg_color = Color(0.80784315, 0.37254903, 0.29411766, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.65882355, 0.28235295, 0.22745098, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s73b6"]
+bg_color = Color(0.65882355, 0.28235295, 0.22745098, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.65882355, 0.28235295, 0.22745098, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_08mrj"]
+bg_color = Color(0.8627451, 0.43529412, 0.3529412, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.65882355, 0.28235295, 0.22745098, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_gslys"]
+
+[node name="AdoptSlot" type="Control" unique_id=275534173]
+custom_minimum_size = Vector2(240, 200)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 240.0
+offset_bottom = 200.0
+mouse_filter = 1
+script = ExtResource("1_o5xss")
+
+[node name="Nest" type="Control" parent="." unique_id=236383478]
+anchors_preset = 0
+offset_right = 240.0
+offset_bottom = 195.0
+mouse_filter = 2
+script = ExtResource("2_s73b6")
+
+[node name="PetView" type="Control" parent="." unique_id=622313409]
+anchors_preset = 0
+offset_left = -66.0
+offset_top = -107.0
+offset_right = 304.0
+offset_bottom = 263.0
+mouse_filter = 2
+script = ExtResource("3_08mrj")
+pet_type = "hamster"
+target_size = 362.59999999999997
+
+[node name="NestFront" type="Control" parent="." unique_id=938116409]
+anchors_preset = 0
+offset_right = 240.0
+offset_bottom = 195.0
+mouse_filter = 2
+script = ExtResource("2_s73b6")
+front_only = true
+
+[node name="AdoptButton" type="Button" parent="." unique_id=738314146]
+layout_mode = 0
+offset_left = 44.0
+offset_top = 163.0
+offset_right = 196.0
+offset_bottom = 210.0
+theme_override_colors/font_color = Color(1, 0.9529412, 0.85882354, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.9529412, 0.85882354, 1)
+theme_override_colors/font_hover_color = Color(1, 0.9529412, 0.85882354, 1)
+theme_override_font_sizes/font_size = 27
+theme_override_styles/normal = SubResource("StyleBoxFlat_o5xss")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_s73b6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_08mrj")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_gslys")
+text = "领养"

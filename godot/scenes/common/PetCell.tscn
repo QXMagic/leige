@@ -1,0 +1,163 @@
+[gd_scene format=3 uid="uid://lahamu0ifjqp"]
+
+[ext_resource type="Script" uid="uid://ybx4on61dqyc" path="res://scenes/common/PetCell.gd" id="1_hy0bk"]
+[ext_resource type="Texture2D" uid="uid://c2lrx18cnpaeo" path="res://resource/ui/bg_grid.png" id="2_s5stt"]
+[ext_resource type="Texture2D" uid="uid://bs806u3yhi118" path="res://resource/ui/fence.png" id="3_jmsha"]
+[ext_resource type="Texture2D" uid="uid://cdyrxmrbu6k63" path="res://resource/ui/shadow.png" id="4_vkry8"]
+[ext_resource type="Script" uid="uid://b5n4jpeg4vwc6" path="res://scenes/pet/PetView.gd" id="5_74eto"]
+[ext_resource type="Texture2D" uid="uid://blbwmg46wi1nw" path="res://resource/ui/name_plate.png" id="6_36vew"]
+[ext_resource type="Texture2D" uid="uid://tndjqhd5puk5" path="res://resource/ui/btn_feed.png" id="7_hvb48"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hy0bk"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_s5stt"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jmsha"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vkry8"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_74eto"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_36vew"]
+bg_color = Color(1, 0.7882353, 0.47058824, 0.1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(1, 0.7882353, 0.47058824, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[node name="PetCell" type="Control" unique_id=1428323944]
+custom_minimum_size = Vector2(396, 254)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 396.0
+offset_bottom = 254.0
+mouse_filter = 1
+script = ExtResource("1_hy0bk")
+
+[node name="Slot" type="NinePatchRect" parent="." unique_id=1170318013]
+modulate = Color(1, 1, 1, 0.12)
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource("2_s5stt")
+patch_margin_left = 30
+patch_margin_top = 30
+patch_margin_right = 30
+patch_margin_bottom = 30
+
+[node name="Fence" type="TextureRect" parent="." unique_id=840363682]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 4.0
+offset_right = 386.0
+offset_bottom = 219.0
+mouse_filter = 2
+texture = ExtResource("3_jmsha")
+expand_mode = 1
+
+[node name="Shadow" type="TextureRect" parent="." unique_id=549037918]
+modulate = Color(1, 1, 1, 0.45)
+layout_mode = 0
+offset_left = 157.0
+offset_top = 158.0
+offset_right = 275.0
+offset_bottom = 194.0
+mouse_filter = 2
+texture = ExtResource("4_vkry8")
+expand_mode = 1
+
+[node name="PetView" type="Control" parent="." unique_id=1901704725]
+anchors_preset = 0
+offset_left = 70.0
+offset_top = -28.0
+offset_right = 362.0
+offset_bottom = 264.0
+mouse_filter = 2
+script = ExtResource("5_74eto")
+target_size = 286.15999999999997
+
+[node name="Hit" type="Button" parent="." unique_id=894877516]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 4.0
+offset_right = 386.0
+offset_bottom = 219.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_hy0bk")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_s5stt")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_jmsha")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_vkry8")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_74eto")
+flat = true
+
+[node name="Plate" type="TextureRect" parent="." unique_id=2021523184]
+layout_mode = 0
+offset_left = 56.0
+offset_top = 198.0
+offset_right = 246.0
+offset_bottom = 244.0
+mouse_filter = 2
+texture = ExtResource("6_36vew")
+expand_mode = 1
+
+[node name="NameLabel" type="Label" parent="." unique_id=412537903]
+layout_mode = 0
+offset_left = 56.0
+offset_top = 198.0
+offset_right = 246.0
+offset_bottom = 244.0
+theme_override_colors/font_color = Color(0.41960785, 0.14117648, 0.0627451, 1)
+theme_override_font_sizes/font_size = 27
+text = "Luna"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Plus" type="Label" parent="." unique_id=1883828716]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 4.0
+offset_right = 386.0
+offset_bottom = 219.0
+theme_override_colors/font_color = Color(0.6117647, 0.76862746, 0.41960785, 1)
+theme_override_colors/font_outline_color = Color(0.42, 0.56, 0.28, 0.55)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 96
+text = "+"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Highlight" type="Panel" parent="." unique_id=405621417]
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_36vew")
+
+[node name="FeedButton" type="TextureButton" parent="." unique_id=1562308885]
+layout_mode = 0
+offset_left = 318.0
+offset_top = 2.0
+offset_right = 408.0
+offset_bottom = 92.0
+tooltip_text = "FEED"
+texture_normal = ExtResource("7_hvb48")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Caption" type="Label" parent="FeedButton" unique_id=195243358]
+layout_mode = 0
+offset_top = 56.0
+offset_right = 90.0
+offset_bottom = 78.0
+theme_override_colors/font_color = Color(1, 0.9411765, 0.8784314, 1)
+theme_override_colors/font_outline_color = Color(0.72, 0.36, 0.26, 0.8)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 16
+text = "FEED"
+horizontal_alignment = 1
+vertical_alignment = 1

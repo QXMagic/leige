@@ -21,6 +21,7 @@ ApiClient="*res://autoload/ApiClient.gd"
 AppState="*res://autoload/AppState.gd"
 ThemeConfig="*res://autoload/ThemeConfig.gd"
 MCPRuntime="*res://addons/godot_mcp/mcp_runtime.gd"
+PetState="*res://autoload/PetState.gd"
 
 [display]
 
@@ -33,6 +34,10 @@ window/handheld/orientation=1
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg")
+
+[gui]
+
+theme/custom_font="res://resource/theme/font_ui.tres"
 
 [input]
 

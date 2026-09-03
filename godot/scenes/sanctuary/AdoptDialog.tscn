@@ -1,0 +1,144 @@
+[gd_scene format=3 uid="uid://difqvc58wrg22"]
+
+[ext_resource type="Script" uid="uid://uw5ps4pf0oa3" path="res://scenes/sanctuary/AdoptDialog.gd" id="1_488ju"]
+[ext_resource type="Texture2D" uid="uid://blbwmg46wi1nw" path="res://resource/ui/name_plate.png" id="2_chdga"]
+[ext_resource type="PackedScene" uid="uid://big4n1ue3cs2v" path="res://scenes/common/AdoptSlot.tscn" id="3_ok68r"]
+[ext_resource type="Script" uid="uid://cg6d6y2kkoc8y" path="res://scenes/common/AdoptSlot.gd" id="4_eatq4"]
+[ext_resource type="Texture2D" uid="uid://bf0pb4grb10ko" path="res://resource/ui/btn_close.png" id="5_hqp7h"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_488ju"]
+bg_color = Color(0.78431374, 0.53333336, 0.36078432, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.6509804, 0.40784314, 0.31764707, 1)
+corner_radius_top_left = 46
+corner_radius_top_right = 46
+corner_radius_bottom_right = 46
+corner_radius_bottom_left = 46
+shadow_color = Color(0.2, 0.1, 0.05, 0.35)
+shadow_size = 22
+shadow_offset = Vector2(0, 10)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_chdga"]
+bg_color = Color(0.90588236, 0.72156864, 0.5568628, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.6509804, 0.40784314, 0.31764707, 0.35)
+corner_radius_top_left = 26
+corner_radius_top_right = 26
+corner_radius_bottom_right = 26
+corner_radius_bottom_left = 26
+
+[node name="AdoptDialog" type="Control" unique_id=1058224001]
+layout_mode = 3
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 1
+script = ExtResource("1_488ju")
+
+[node name="Dim" type="ColorRect" parent="." unique_id=950658597]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.2, 0.11, 0.06, 0.62)
+
+[node name="Panel" type="Panel" parent="." unique_id=1130252908]
+layout_mode = 0
+offset_left = 492.0
+offset_top = 143.0
+offset_right = 1428.0
+offset_bottom = 902.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_488ju")
+
+[node name="Inner" type="Panel" parent="Panel" unique_id=277840994]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 30.0
+offset_right = 906.0
+offset_bottom = 729.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_chdga")
+
+[node name="TopPlate" type="TextureRect" parent="Panel" unique_id=738188618]
+modulate = Color(0.72, 0.55, 0.47, 1)
+layout_mode = 0
+offset_left = 229.0
+offset_top = -36.0
+offset_right = 748.0
+offset_bottom = 65.0
+mouse_filter = 2
+texture = ExtResource("2_chdga")
+expand_mode = 1
+
+[node name="Scroll" type="ScrollContainer" parent="Panel" unique_id=1072588379]
+layout_mode = 0
+offset_left = 38.0
+offset_top = 58.0
+offset_right = 898.0
+offset_bottom = 721.0
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="Grid" type="GridContainer" parent="Panel/Scroll" unique_id=1563677934]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 40
+theme_override_constants/v_separation = 25
+columns = 3
+
+[node name="Slot1" type="Control" parent="Panel/Scroll/Grid" unique_id=275534173 instance=ExtResource("3_ok68r")]
+custom_minimum_size = Vector2(240, 200)
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("4_eatq4")
+
+[node name="Slot2" type="Control" parent="Panel/Scroll/Grid" unique_id=77252837 instance=ExtResource("3_ok68r")]
+custom_minimum_size = Vector2(240, 200)
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("4_eatq4")
+
+[node name="Slot3" type="Control" parent="Panel/Scroll/Grid" unique_id=304896383 instance=ExtResource("3_ok68r")]
+custom_minimum_size = Vector2(240, 200)
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("4_eatq4")
+
+[node name="Slot4" type="Control" parent="Panel/Scroll/Grid" unique_id=1780810522 instance=ExtResource("3_ok68r")]
+custom_minimum_size = Vector2(240, 200)
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("4_eatq4")
+
+[node name="Slot5" type="Control" parent="Panel/Scroll/Grid" unique_id=1993450044 instance=ExtResource("3_ok68r")]
+custom_minimum_size = Vector2(240, 200)
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("4_eatq4")
+
+[node name="Slot6" type="Control" parent="Panel/Scroll/Grid" unique_id=1455461768 instance=ExtResource("3_ok68r")]
+custom_minimum_size = Vector2(240, 200)
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("4_eatq4")
+
+[node name="Slot7" type="Control" parent="Panel/Scroll/Grid" unique_id=1797436866 instance=ExtResource("3_ok68r")]
+custom_minimum_size = Vector2(240, 200)
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("4_eatq4")
+
+[node name="CloseButton" type="TextureButton" parent="Panel" unique_id=616706275]
+layout_mode = 0
+offset_left = 845.0
+offset_top = 46.0
+offset_right = 905.0
+offset_bottom = 102.0
+texture_normal = ExtResource("5_hqp7h")
+ignore_texture_size = true
+stretch_mode = 0

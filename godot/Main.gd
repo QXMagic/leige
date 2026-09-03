@@ -1,74 +1,76 @@
 extends Control
+## Root router: Home <-> Sanctuary, with a short cross-fade between them.
+## Shared data lives in the PetState autoload, not in the views, because each
+## view is rebuilt from scratch on every navigation.
 
-const UI = preload("res://autoload/UIHelpers.gd")
+const LOADING_SCENE := "res://scenes/loading/Loading.tscn"
+const HOME_SCENE := "res://scenes/home/MainHome.tscn"
+const SANCTUARY_SCENE := "res://scenes/sanctuary/Sanctuary.tscn"
+const FADE_TIME := 0.18
 
-var _pages := {}
-var _current_node: Node = null
-var _current_name: String = ""
+var _current: Control = null
+var _fade: ColorRect = null
+var _busy: bool = false
+
 
 func _ready() -> void:
-	anchor_right = 1.0
-	anchor_bottom = 1.0
+	_fade = ColorRect.new()
+	_fade.color = Color(0.16, 0.09, 0.05, 0.0)
+	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_fade.z_index = 100
+	add_child(_fade)
+	_show(LOADING_SCENE, false)
 
-	_pages = {
-		"home": load("res://scenes/home/MainHome.tscn"),
-		"habitat": load("res://scenes/habitat/Habitat.tscn"),
-		"explore": func(): return _make_placeholder("🗺️ 探索模式（开发中）", "团队副本 · 知识寻宝 · 迷宫探险"),
-		"dex": func(): return _make_placeholder("📖 宠物图鉴（开发中）", "收集、解锁、查看宠物详情"),
-	}
 
-	var app: Node = get_node("/root/AppState")
-	app.page_changed.connect(_show_page)
-	_show_page("home")
-	app.load_all()
+func _show_home() -> void:
+	_show(HOME_SCENE)
 
-func _show_page(name: String) -> void:
-	if _current_name == name and _current_node:
+
+func _show_sanctuary() -> void:
+	_show(SANCTUARY_SCENE)
+
+
+func _show(path: String, animate: bool = true) -> void:
+	if _busy:
 		return
-	if _current_node:
-		remove_child(_current_node)
-		_current_node.queue_free()
+	_busy = true
+	if animate:
+		await _tween_fade(1.0)
+	_swap((load(path) as PackedScene).instantiate())
+	if animate:
+		await _tween_fade(0.0)
+	_busy = false
 
-	var src = _pages.get(name)
-	if src == null:
-		push_error("Unknown page: " + name)
-		return
 
-	var node: Node
-	if src is PackedScene:
-		node = src.instantiate()
-	elif src is Callable:
-		node = src.call()
+func _tween_fade(alpha: float) -> void:
+	var t := create_tween()
+	t.tween_property(_fade, "color:a", alpha, FADE_TIME)
+	await t.finished
+
+
+func _swap(view: Control) -> void:
+	if _current and is_instance_valid(_current):
+		_current.queue_free()
+	_current = view
+	view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(view)
+	move_child(_fade, get_child_count() - 1)   # keep the fade on top
+	_wire(view)
+
+
+func _wire(view: Control) -> void:
+	if view.has_signal("finished"):
+		view.finished.connect(_show_home)
+	if view.has_signal("enter_sanctuary"):
+		view.enter_sanctuary.connect(_show_sanctuary)
+	if view.has_signal("closed"):
+		view.closed.connect(_on_view_closed.bind(view))
+
+
+func _on_view_closed(view: Control) -> void:
+	# The sanctuary closes back to the home screen; the home screen exits.
+	if view.scene_file_path == SANCTUARY_SCENE:
+		_show_home()
 	else:
-		push_error("Invalid page source for " + name)
-		return
-
-	if node is Control:
-		node.anchor_right = 1.0
-		node.anchor_bottom = 1.0
-
-	add_child(node)
-	_current_node = node
-	_current_name = name
-
-func _make_placeholder(title: String, subtitle: String) -> Control:
-	var root := Control.new()
-
-	var bg := ColorRect.new()
-	bg.color = ThemeConfig.BG_1
-	bg.anchor_right = 1.0
-	bg.anchor_bottom = 1.0
-	root.add_child(bg)
-
-	var v := VBoxContainer.new()
-	v.anchor_right = 1.0
-	v.anchor_bottom = 1.0
-	v.alignment = BoxContainer.ALIGNMENT_CENTER
-	v.add_theme_constant_override("separation", 16)
-	root.add_child(v)
-
-	v.add_child(UI.label_gradient(title, 28))
-	v.add_child(UI.label(subtitle, 16, ThemeConfig.TEXT_3))
-	v.add_child(UI.label("🏠 点击底栏切换到主页", 14, ThemeConfig.TEXT_3))
-
-	return root
+		get_tree().quit()

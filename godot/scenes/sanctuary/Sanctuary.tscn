@@ -1,0 +1,147 @@
+[gd_scene format=3 uid="uid://cfc8n61lb4wly"]
+
+[ext_resource type="Script" uid="uid://dyyn12m57hgy3" path="res://scenes/sanctuary/Sanctuary.gd" id="1_dfuip"]
+[ext_resource type="Texture2D" uid="uid://bwqjw01qlnok0" path="res://resource/sprites/illustration.png" id="2_qdxnf"]
+[ext_resource type="Texture2D" uid="uid://evne46xdnr6e" path="res://resource/ui/bg_panel.png" id="3_t6qoe"]
+[ext_resource type="PackedScene" uid="uid://lahamu0ifjqp" path="res://scenes/common/PetCell.tscn" id="5_dnri6"]
+[ext_resource type="Script" uid="uid://ybx4on61dqyc" path="res://scenes/common/PetCell.gd" id="6_8x67e"]
+[ext_resource type="Texture2D" uid="uid://bf0pb4grb10ko" path="res://resource/ui/btn_close.png" id="7_ov6y5"]
+
+[node name="Sanctuary" type="Control" unique_id=1889918471]
+layout_mode = 3
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_dfuip")
+
+[node name="Background" type="TextureRect" parent="." unique_id=865748099]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = ExtResource("2_qdxnf")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Panel" type="TextureRect" parent="." unique_id=1935928041]
+layout_mode = 0
+offset_left = 70.0
+offset_top = 38.0
+offset_right = 1850.0
+offset_bottom = 1036.0
+texture = ExtResource("3_t6qoe")
+expand_mode = 1
+
+[node name="Title" type="Label" parent="Panel" unique_id=1902128462]
+layout_mode = 0
+offset_left = 454.0
+offset_top = 9.0
+offset_right = 1326.0
+offset_bottom = 127.0
+theme_override_colors/font_color = Color(0.9529412, 0.827451, 0.6901961, 1)
+theme_override_colors/font_shadow_color = Color(0.35, 0.18, 0.08, 0.45)
+theme_override_colors/font_outline_color = Color(0.5411765, 0.30980393, 0.17254902, 1)
+theme_override_constants/shadow_offset_y = 3
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 52
+text = "PET SANCTUARY MANAGEMENT"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GridArea" type="Control" parent="Panel" unique_id=1490163711]
+anchors_preset = 0
+offset_left = 69.0
+offset_top = 178.0
+offset_right = 1710.0
+offset_bottom = 970.0
+mouse_filter = 1
+
+[node name="Grid" type="GridContainer" parent="Panel/GridArea" unique_id=410894770]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/h_separation = 19
+theme_override_constants/v_separation = 15
+columns = 4
+
+[node name="Cell1" type="Control" parent="Panel/GridArea/Grid" unique_id=1428323944 instance=ExtResource("5_dnri6")]
+custom_minimum_size = Vector2(396, 254)
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("6_8x67e")
+
+[node name="Cell2" type="Control" parent="Panel/GridArea/Grid" unique_id=832341696 instance=ExtResource("5_dnri6")]
+custom_minimum_size = Vector2(396, 254)
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("6_8x67e")
+
+[node name="Cell3" type="Control" parent="Panel/GridArea/Grid" unique_id=780333604 instance=ExtResource("5_dnri6")]
+custom_minimum_size = Vector2(396, 254)
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("6_8x67e")
+
+[node name="Cell4" type="Control" parent="Panel/GridArea/Grid" unique_id=121511027 instance=ExtResource("5_dnri6")]
+custom_minimum_size = Vector2(396, 254)
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("6_8x67e")
+
+[node name="Cell5" type="Control" parent="Panel/GridArea/Grid" unique_id=1008740030 instance=ExtResource("5_dnri6")]
+custom_minimum_size = Vector2(396, 254)
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("6_8x67e")
+
+[node name="Cell6" type="Control" parent="Panel/GridArea/Grid" unique_id=313430209 instance=ExtResource("5_dnri6")]
+custom_minimum_size = Vector2(396, 254)
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("6_8x67e")
+
+[node name="Cell7" type="Control" parent="Panel/GridArea/Grid" unique_id=1943613792 instance=ExtResource("5_dnri6")]
+custom_minimum_size = Vector2(396, 254)
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("6_8x67e")
+
+[node name="Cell8" type="Control" parent="Panel/GridArea/Grid" unique_id=973900119 instance=ExtResource("5_dnri6")]
+custom_minimum_size = Vector2(396, 254)
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("6_8x67e")
+
+[node name="Cell9" type="Control" parent="Panel/GridArea/Grid" unique_id=1693943137 instance=ExtResource("5_dnri6")]
+custom_minimum_size = Vector2(396, 254)
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("6_8x67e")
+
+[node name="Cell10" type="Control" parent="Panel/GridArea/Grid" unique_id=1867871672 instance=ExtResource("5_dnri6")]
+custom_minimum_size = Vector2(396, 254)
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("6_8x67e")
+
+[node name="Cell11" type="Control" parent="Panel/GridArea/Grid" unique_id=1753513958 instance=ExtResource("5_dnri6")]
+custom_minimum_size = Vector2(396, 254)
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("6_8x67e")
+
+[node name="Cell12" type="Control" parent="Panel/GridArea/Grid" unique_id=222471906 instance=ExtResource("5_dnri6")]
+custom_minimum_size = Vector2(396, 254)
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("6_8x67e")
+
+[node name="CloseButton" type="TextureButton" parent="." unique_id=855842764]
+layout_mode = 0
+offset_left = 1715.0
+offset_top = 62.0
+offset_right = 1791.0
+offset_bottom = 132.0
+texture_normal = ExtResource("7_ov6y5")
+ignore_texture_size = true
+stretch_mode = 0
