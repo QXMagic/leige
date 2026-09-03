@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "godot-mcp": {
+      "command": "C:\\Users\\xinru\\godot_mcp.bat",
+      "args": []
+    }
+  }
+}

@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>幻兽学园 - 首页</title>
+<style>
+:root {
+  --bg-1: #14142b;
+  --bg-2: #1a1d3a;
+  --bg-3: #1b2d2e;
+  --surface: rgba(255,255,255,0.06);
+  --surface-2: rgba(255,255,255,0.04);
+  --surface-hover: rgba(255,255,255,0.1);
+  --border: rgba(255,255,255,0.1);
+  --border-strong: rgba(255,255,255,0.2);
+  --text: #f0f0f5;
+  --text-2: #b8b8cc;
+  --text-3: #7a7a92;
+  --brand: #8B5CF6;
+  --brand-2: #A78BFA;
+  --brand-glow: rgba(139,92,246,0.35);
+  --gold: #F59E0B;
+  --gold-glow: rgba(245,158,11,0.3);
+  --green: #10B981;
+  --red: #EF4444;
+  --g1: #38BDF8;
+  --g2: #6366F1;
+  --g3: #F97316;
+  --g4: #EC4899;
+  --radius: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.3);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,0.4);
+  --font: "PingFang SC","Microsoft YaHei","SF Pro Text",system-ui,sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: var(--font);
+  background: linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 45%, var(--bg-3) 100%);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 600px 400px at 20% 80%, rgba(16,185,129,0.08), transparent),
+    radial-gradient(ellipse 500px 500px at 80% 20%, rgba(139,92,246,0.1), transparent),
+    radial-gradient(ellipse 400px 300px at 50% 50%, rgba(56,189,248,0.05), transparent);
+  pointer-events: none;
+}
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='1' fill='rgba(255,255,255,0.03)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+.app {
+  display: grid;
+  grid-template-rows: 64px 1fr 72px;
+  height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== TOP BAR ===== */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.topbar-left, .topbar-right { display: flex; align-items: center; gap: 12px; }
+.topbar-center {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, var(--brand-2), var(--g1));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.mood-pill {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 16px;
+  background: rgba(16,185,129,0.12);
+  border: 1px solid rgba(16,185,129,0.3);
+  border-radius: 999px;
+}
+.mood-emoji { font-size: 22px; }
+.mood-text { font-size: 14px; color: var(--green); font-weight: 500; }
+.mood-bonus {
+  font-size: 12px; font-weight: 600;
+  padding: 2px 10px;
+  background: var(--green);
+  color: #fff;
+  border-radius: 999px;
+}
+.energy-pill {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 16px;
+  background: rgba(245,158,11,0.12);
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: 999px;
+}
+.energy-icon { font-size: 20px; }
+.energy-text { font-size: 14px; color: var(--gold); font-weight: 600; font-variant-numeric: tabular-nums; }
+.energy-num { font-size: 18px; font-weight: 700; }
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+  display: grid;
+  grid-template-columns: 200px 1fr 200px;
+  gap: 16px;
+  padding: 16px;
+  overflow: hidden;
+}
+
+/* ===== SIDEBARS ===== */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.panel {
+  background: var(--surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+.panel-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Badges */
+.badge-list { display: flex; flex-direction: column; gap: 8px; }
+.badge {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all 0.2s;
+}
+.badge:hover { background: var(--surface-hover); transform: translateX(2px); }
+.badge.unlocked {
+  border-color: rgba(139,92,246,0.3);
+  background: rgba(139,92,246,0.08);
+}
+.badge.locked { opacity: 0.35; }
+.badge-icon {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+.badge.unlocked .badge-icon {
+  background: rgba(139,92,246,0.15);
+  border-color: rgba(139,92,246,0.3);
+}
+.badge-name { font-size: 13px; font-weight: 500; color: var(--text); }
+.badge.locked .badge-name { color: var(--text-3); }
+
+/* Puzzle */
+.puzzle-track {
+  height: 10px;
+  background: var(--surface-2);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.puzzle-fill {
+  height: 100%;
+  width: 60%;
+  background: linear-gradient(90deg, var(--brand), var(--brand-2));
+  border-radius: 999px;
+  box-shadow: 0 0 12px var(--brand-glow);
+  animation: shimmer 2s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+.puzzle-info {
+  font-size: 12px; color: var(--text-3); margin-top: 6px;
+  display: flex; justify-content: space-between;
+}
+.puzzle-info strong { color: var(--brand-2); font-weight: 600; }
+
+/* Rankings */
+.rank-list { display: flex; flex-direction: column; gap: 8px; }
+.rank-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all 0.2s;
+}
+.rank-item:hover { background: var(--surface-hover); }
+.rank-1 {
+  border-color: rgba(245,158,11,0.3);
+  background: rgba(245,158,11,0.08);
+}
+.rank-medal { font-size: 20px; width: 28px; text-align: center; }
+.rank-name { font-size: 13px; font-weight: 500; flex: 1; }
+.rank-score { font-size: 13px; font-weight: 600; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.rank-1 .rank-score { color: var(--gold); }
+
+/* Tasks */
+.task-list { display: flex; flex-direction: column; gap: 6px; }
+.task {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 0;
+  font-size: 13px;
+}
+.task-icon { font-size: 16px; }
+.task.done { color: var(--green); }
+.task.done .task-text { text-decoration: line-through; opacity: 0.6; }
+.task.pending { color: var(--text-2); }
+
+/* Challenge */
+.challenge-box {
+  padding: 10px 12px;
+  background: rgba(245,158,11,0.08);
+  border: 1px solid rgba(245,158,11,0.2);
+  border-radius: var(--radius);
+}
+.challenge-streak { font-size: 14px; font-weight: 600; color: var(--gold); margin-bottom: 4px; }
+.challenge-reward { font-size: 12px; color: var(--text-3); }
+
+/* ===== HABITAT VIEW ===== */
+.habitat-view {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+}
+.habitat-header {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  padding: 8px 20px;
+}
+.habitat-title {
+  font-size: 20px; font-weight: 600;
+  background: linear-gradient(135deg, var(--brand-2), var(--g1));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.habitat-level {
+  font-size: 13px; color: var(--text-3);
+  padding: 4px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.habitat-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 14px;
+  min-height: 0;
+}
+
+/* Group Zone */
+.group-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 18px 14px;
+  background: var(--surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-xl);
+  position: relative;
+  transition: all 0.3s;
+}
+.group-zone:hover { border-color: var(--border-strong); background: var(--surface-hover); }
+.group-zone.evolvable {
+  border-style: solid;
+  animation: pulse-border 2s ease-in-out infinite;
+}
+@keyframes pulse-border {
+  0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.3); }
+  50% { box-shadow: 0 0 24px 4px rgba(245,158,11,0.2); }
+}
+.zone-header {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; font-weight: 600;
+}
+.zone-rank-badge {
+  font-size: 11px; font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(245,158,11,0.15);
+  color: var(--gold);
+  border: 1px solid rgba(245,158,11,0.3);
+}
+.pet-avatar {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 44px;
+  background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.08), transparent);
+  border: 3px solid var(--border);
+  position: relative;
+  transition: transform 0.3s;
+}
+.group-zone:hover .pet-avatar { transform: scale(1.05); }
+.pet-avatar.glow-1 { border-color: var(--g1); box-shadow: 0 0 20px rgba(56,189,248,0.3); }
+.pet-avatar.glow-2 { border-color: var(--g2); box-shadow: 0 0 20px rgba(99,102,241,0.3); }
+.pet-avatar.glow-3 { border-color: var(--g3); box-shadow: 0 0 20px rgba(249,115,22,0.3); }
+.pet-avatar.glow-4 { border-color: var(--g4); box-shadow: 0 0 20px rgba(236,72,153,0.3); }
+.pet-avatar.evolvable { border-color: var(--gold); box-shadow: 0 0 28px rgba(245,158,11,0.4); }
+
+.energy-bar-wrap { width: 100%; }
+.energy-bar {
+  height: 8px;
+  background: var(--surface-2);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.energy-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+.ef-1 { background: linear-gradient(90deg, #0EA5E9, #38BDF8); box-shadow: 0 0 10px rgba(56,189,248,0.4); }
+.ef-2 { background: linear-gradient(90deg, #4F46E5, #818CF8); box-shadow: 0 0 10px rgba(99,102,241,0.4); }
+.ef-3 { background: linear-gradient(90deg, #EA580C, #F97316); box-shadow: 0 0 10px rgba(249,115,22,0.4); }
+.ef-4 { background: linear-gradient(90deg, #DB2777, #EC4899); box-shadow: 0 0 10px rgba(236,72,153,0.4); }
+
+.zone-footer {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--text-3);
+}
+.zone-level { font-weight: 600; color: var(--text-2); }
+.zone-evolve-hint {
+  font-size: 11px; font-weight: 600;
+  padding: 2px 10px;
+  background: rgba(245,158,11,0.15);
+  color: var(--gold);
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: 999px;
+  animation: blink 1.5s ease-in-out infinite;
+}
+@keyframes blink {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Public Plaza */
+.public-plaza {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(139,92,246,0.12), rgba(56,189,248,0.08));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid rgba(139,92,246,0.25);
+  border-radius: var(--radius-xl);
+  position: relative;
+  overflow: hidden;
+}
+.public-plaza::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, rgba(139,92,246,0.08), transparent 70%);
+  pointer-events: none;
+}
+.plaza-title {
+  font-size: 18px; font-weight: 600;
+  color: var(--brand-2);
+  display: flex; align-items: center; gap: 8px;
+  position: relative;
+}
+.plaza-furniture {
+  display: flex;
+  gap: 20px;
+  position: relative;
+}
+.furniture-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all 0.2s;
+}
+.furniture-item:hover { transform: translateY(-3px); background: var(--surface-hover); }
+.furniture-emoji { font-size: 36px; }
+.furniture-name { font-size: 11px; color: var(--text-3); }
+.plaza-bonuses {
+  display: flex; gap: 8px;
+  position: relative;
+}
+.bonus-tag {
+  font-size: 12px; font-weight: 500;
+  padding: 4px 12px;
+  background: rgba(139,92,246,0.15);
+  border: 1px solid rgba(139,92,246,0.3);
+  color: var(--brand-2);
+  border-radius: 999px;
+}
+.plaza-desc {
+  font-size: 12px;
+  color: var(--text-3);
+  text-align: center;
+  position: relative;
+}
+
+/* ===== BOTTOM BAR ===== */
+.bottombar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 24px;
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+}
+.action-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 20px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 14px; font-weight: 500;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.action-btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+.action-btn.primary {
+  background: rgba(245,158,11,0.15);
+  border-color: rgba(245,158,11,0.3);
+  color: var(--gold);
+}
+.action-btn.primary:hover {
+  background: rgba(245,158,11,0.25);
+}
+.action-btn.magic {
+  background: rgba(139,92,246,0.15);
+  border-color: rgba(139,92,246,0.3);
+  color: var(--brand-2);
+}
+.action-btn.magic:hover {
+  background: rgba(139,92,246,0.25);
+}
+.nav-spacer { flex: 1; }
+.nav-tabs { display: flex; gap: 6px; }
+.nav-tab {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 18px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  color: var(--text-3);
+  font-size: 14px; font-weight: 500;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.nav-tab:hover { color: var(--text-2); background: var(--surface-2); }
+.nav-tab.active {
+  background: var(--brand);
+  color: #fff;
+  box-shadow: 0 4px 16px var(--brand-glow);
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== TOP BAR ===== -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="mood-pill">
+        <span class="mood-emoji">😊</span>
+        <span class="mood-text">班级心情：开心</span>
+        <span class="mood-bonus">+20%</span>
+      </div>
+    </div>
+    <div class="topbar-center">🌟 幻兽学园 · 三年级二班</div>
+    <div class="topbar-right">
+      <div class="energy-pill">
+        <span class="energy-icon">⚡</span>
+        <span class="energy-text">总能量</span>
+        <span class="energy-num">1,250</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="main-content">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar">
+      <div class="panel">
+        <div class="panel-title">🏆 班级徽章墙</div>
+        <div class="badge-list">
+          <div class="badge unlocked">
+            <div class="badge-icon">🏆</div>
+            <div class="badge-name">全员达标</div>
+          </div>
+          <div class="badge unlocked">
+            <div class="badge-icon">📚</div>
+            <div class="badge-name">活跃课堂</div>
+          </div>
+          <div class="badge unlocked">
+            <div class="badge-icon">🤝</div>
+            <div class="badge-name">团结友爱</div>
+          </div>
+          <div class="badge locked">
+            <div class="badge-icon">❓</div>
+            <div class="badge-name">未解锁</div>
+          </div>
+          <div class="badge locked">
+            <div class="badge-icon">❓</div>
+            <div class="badge-name">未解锁</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">🧩 知识拼图</div>
+        <div class="puzzle-track">
+          <div class="puzzle-fill"></div>
+        </div>
+        <div class="puzzle-info">
+          <span>古诗拼图</span>
+          <span><strong>6</strong> / 10</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER: HABITAT -->
+    <section class="habitat-view">
+      <div class="habitat-header">
+        <div class="habitat-title">🌱 班级共享家园</div>
+        <div class="habitat-level">小型营地 · Lv.8</div>
+      </div>
+
+      <div class="habitat-grid">
+        <!-- Group 1 -->
+        <div class="group-zone">
+          <div class="zone-header">
+            <span style="color:var(--g1)">第1组</span>
+            <span style="color:var(--text-2);font-size:13px">乘风鹰</span>
+          </div>
+          <div class="pet-avatar glow-1">🦅</div>
+          <div class="energy-bar-wrap">
+            <div class="energy-bar">
+              <div class="energy-fill ef-1" style="width:75%"></div>
+            </div>
+          </div>
+          <div class="zone-footer">
+            <span class="zone-level">Lv.8</span>
+            <span>75%</span>
+          </div>
+        </div>
+
+        <!-- Public Plaza -->
+        <div class="public-plaza">
+          <div class="plaza-title">🏛️ 公共广场</div>
+          <div class="plaza-furniture">
+            <div class="furniture-item">
+              <div class="furniture-emoji">💎</div>
+              <div class="furniture-name">能量水晶</div>
+            </div>
+            <div class="furniture-item">
+              <div class="furniture-emoji">📚</div>
+              <div class="furniture-name">智慧书架</div>
+            </div>
+            <div class="furniture-item">
+              <div class="furniture-emoji">🎠</div>
+              <div class="furniture-name">活力滑梯</div>
+            </div>
+          </div>
+          <div class="plaza-bonuses">
+            <span class="bonus-tag">💎 +5能量/日</span>
+            <span class="bonus-tag">📚 智慧+10%</span>
+            <span class="bonus-tag">🎠 精力+15%</span>
+          </div>
+          <div class="plaza-desc">功能型家具 · 全班共享加成<br>进化仪式与庆祝活动举办地</div>
+        </div>
+
+        <!-- Group 2 -->
+        <div class="group-zone">
+          <div class="zone-header">
+            <span style="color:var(--g2)">第2组</span>
+            <span style="color:var(--text-2);font-size:13px">水灵龟</span>
+          </div>
+          <div class="pet-avatar glow-2">🐢</div>
+          <div class="energy-bar-wrap">
+            <div class="energy-bar">
+              <div class="energy-fill ef-2" style="width:60%"></div>
+            </div>
+          </div>
+          <div class="zone-footer">
+            <span class="zone-level">Lv.6</span>
+            <span>60%</span>
+          </div>
+        </div>
+
+        <!-- Group 3 (evolvable) -->
+        <div class="group-zone evolvable">
+          <div class="zone-header">
+            <span style="color:var(--g3)">第3组</span>
+            <span style="color:var(--text-2);font-size:13px">炎火狐</span>
+            <span class="zone-rank-badge">⭐ Top 1</span>
+          </div>
+          <div class="pet-avatar glow-3 evolvable">🦊</div>
+          <div class="energy-bar-wrap">
+            <div class="energy-bar">
+              <div class="energy-fill ef-3" style="width:90%"></div>
+            </div>
+          </div>
+          <div class="zone-footer">
+            <span class="zone-level">Lv.10</span>
+            <span>90%</span>
+            <span class="zone-evolve-hint">可进化!</span>
+          </div>
+        </div>
+
+        <!-- Group 4 -->
+        <div class="group-zone">
+          <div class="zone-header">
+            <span style="color:var(--g4)">第4组</span>
+            <span style="color:var(--text-2);font-size:13px">光翼蝶</span>
+          </div>
+          <div class="pet-avatar glow-4">🦋</div>
+          <div class="energy-bar-wrap">
+            <div class="energy-bar">
+              <div class="energy-fill ef-4" style="width:45%"></div>
+            </div>
+          </div>
+          <div class="zone-footer">
+            <span class="zone-level">Lv.5</span>
+            <span>45%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="sidebar">
+      <div class="panel">
+        <div class="panel-title">📊 小组排行</div>
+        <div class="rank-list">
+          <div class="rank-item rank-1">
+            <span class="rank-medal">🥇</span>
+            <span class="rank-name">第3组</span>
+            <span class="rank-score">920</span>
+          </div>
+          <div class="rank-item">
+            <span class="rank-medal">🥈</span>
+            <span class="rank-name">第1组</span>
+            <span class="rank-score">750</span>
+          </div>
+          <div class="rank-item">
+            <span class="rank-medal">🥉</span>
+            <span class="rank-name">第4组</span>
+            <span class="rank-score">520</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">📋 本周班级任务</div>
+        <div class="task-list">
+          <div class="task done">
+            <span class="task-icon">✅</span>
+            <span class="task-text">全班作业上交率 95%</span>
+          </div>
+          <div class="task pending">
+            <span class="task-icon">⬜</span>
+            <span class="task-text">通关一次团队副本</span>
+          </div>
+          <div class="task pending">
+            <span class="task-icon">⬜</span>
+            <span class="task-text">卫生检查达标</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">🔥 周常挑战</div>
+        <div class="challenge-box">
+          <div class="challenge-streak">连续完成 ✓✓</div>
+          <div class="challenge-reward">下周奖励：能量果 ×5</div>
+        </div>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- ===== BOTTOM BAR ===== -->
+  <footer class="bottombar">
+    <button class="action-btn primary">🍎 投喂能量果</button>
+    <button class="action-btn magic">✨ 惊喜按钮</button>
+    <div class="nav-spacer"></div>
+    <div class="nav-tabs">
+      <button class="nav-tab active">🏠 主页</button>
+      <button class="nav-tab">🌍 家园</button>
+      <button class="nav-tab">🗺️ 探索</button>
+      <button class="nav-tab">📖 图鉴</button>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

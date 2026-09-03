@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>幻兽学园 - 家园页</title>
+<style>
+:root {
+  --bg-1: #14142b;
+  --bg-2: #1a1d3a;
+  --bg-3: #1b2d2e;
+  --surface: rgba(255,255,255,0.06);
+  --surface-2: rgba(255,255,255,0.04);
+  --surface-hover: rgba(255,255,255,0.1);
+  --border: rgba(255,255,255,0.1);
+  --border-strong: rgba(255,255,255,0.2);
+  --text: #f0f0f5;
+  --text-2: #b8b8cc;
+  --text-3: #7a7a92;
+  --brand: #8B5CF6;
+  --brand-2: #A78BFA;
+  --brand-glow: rgba(139,92,246,0.35);
+  --gold: #F59E0B;
+  --gold-glow: rgba(245,158,11,0.3);
+  --green: #10B981;
+  --red: #EF4444;
+  --g1: #38BDF8;
+  --g2: #6366F1;
+  --g3: #F97316;
+  --g4: #EC4899;
+  --radius: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.3);
+  --font: "PingFang SC","Microsoft YaHei","SF Pro Text",system-ui,sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: var(--font);
+  background: linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 45%, var(--bg-3) 100%);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 700px 500px at 50% 60%, rgba(16,185,129,0.1), transparent),
+    radial-gradient(ellipse 500px 500px at 80% 20%, rgba(139,92,246,0.1), transparent),
+    radial-gradient(ellipse 400px 300px at 20% 30%, rgba(56,189,248,0.06), transparent);
+  pointer-events: none;
+}
+
+.app {
+  display: grid;
+  grid-template-rows: 64px 1fr 72px;
+  height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== TOP BAR ===== */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.topbar-left, .topbar-right { display: flex; align-items: center; gap: 12px; }
+.topbar-center {
+  font-size: 20px;
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--brand-2), var(--g1));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.info-pill {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 16px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 14px;
+}
+.info-pill.gold {
+  background: rgba(245,158,11,0.12);
+  border-color: rgba(245,158,11,0.3);
+}
+.info-pill.brand {
+  background: rgba(139,92,246,0.12);
+  border-color: rgba(139,92,246,0.3);
+}
+.info-pill.green {
+  background: rgba(16,185,129,0.12);
+  border-color: rgba(16,185,129,0.3);
+}
+.info-label { font-size: 13px; color: var(--text-3); }
+.info-value { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.info-pill.gold .info-value { color: var(--gold); }
+.info-pill.brand .info-value { color: var(--brand-2); }
+.info-pill.green .info-value { color: var(--green); }
+
+.theme-badge {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 14px;
+  background: rgba(16,185,129,0.12);
+  border: 1px solid rgba(16,185,129,0.3);
+  border-radius: 999px;
+  font-size: 13px; color: var(--green); font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.theme-badge:hover { background: rgba(16,185,129,0.2); }
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+  display: grid;
+  grid-template-columns: 240px 1fr 220px;
+  gap: 16px;
+  padding: 16px;
+  overflow: hidden;
+}
+
+/* ===== FURNITURE PANEL (LEFT) ===== */
+.furniture-panel {
+  background: var(--surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+}
+.furniture-panel::-webkit-scrollbar { width: 4px; }
+.furniture-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.panel-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 6px;
+}
+
+.category-tabs {
+  display: flex; gap: 6px;
+}
+.cat-tab {
+  flex: 1;
+  padding: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-3);
+  font-size: 12px; font-weight: 500;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.cat-tab:hover { background: var(--surface-hover); }
+.cat-tab.active {
+  background: var(--brand);
+  color: #fff;
+  border-color: var(--brand);
+}
+
+.furniture-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.furniture-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.furniture-card:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+.furniture-card.placed {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.furniture-card.functional {
+  border-color: rgba(139,92,246,0.2);
+  background: rgba(139,92,246,0.06);
+}
+.fc-icon { font-size: 32px; }
+.fc-name { font-size: 11px; color: var(--text-2); text-align: center; }
+.fc-tag {
+  font-size: 10px; font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 999px;
+}
+.fc-tag.functional { background: rgba(139,92,246,0.15); color: var(--brand-2); }
+.fc-tag.decorative { background: rgba(56,189,248,0.15); color: var(--g1); }
+.fc-placed-mark {
+  position: absolute;
+  top: 4px; right: 4px;
+  font-size: 14px;
+  color: var(--green);
+}
+
+/* ===== HABITAT SCENE (CENTER) ===== */
+.habitat-scene {
+  background: var(--surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.scene-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.scene-title {
+  font-size: 18px; font-weight: 600;
+  display: flex; align-items: center; gap: 8px;
+}
+.grid-indicator {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 12px;
+  background: rgba(139,92,246,0.12);
+  border: 1px solid rgba(139,92,246,0.3);
+  border-radius: 999px;
+  font-size: 12px; color: var(--brand-2);
+}
+
+.scene-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1.3fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 14px;
+  min-height: 0;
+  position: relative;
+}
+
+/* Group Zone in Habitat */
+.h-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  background: var(--surface-2);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+}
+.h-zone.g1 { border-color: rgba(56,189,248,0.25); }
+.h-zone.g2 { border-color: rgba(99,102,241,0.25); }
+.h-zone.g3 { border-color: rgba(249,115,22,0.25); }
+.h-zone.g4 { border-color: rgba(236,72,153,0.25); }
+
+.h-zone-header {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.h-zone-name { font-size: 14px; font-weight: 600; }
+.h-zone.g1 .h-zone-name { color: var(--g1); }
+.h-zone.g2 .h-zone-name { color: var(--g2); }
+.h-zone.g3 .h-zone-name { color: var(--g3); }
+.h-zone.g4 .h-zone-name { color: var(--g4); }
+
+.h-zone-beauty {
+  font-size: 12px; color: var(--gold);
+}
+
+.h-zone-body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.h-zone-pet {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px;
+  background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.08), transparent);
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+}
+.h-zone.g1 .h-zone-pet { border-color: rgba(56,189,248,0.3); }
+.h-zone.g2 .h-zone-pet { border-color: rgba(99,102,241,0.3); }
+.h-zone.g3 .h-zone-pet { border-color: rgba(249,115,22,0.3); }
+.h-zone.g4 .h-zone-pet { border-color: rgba(236,72,153,0.3); }
+
+.h-zone-decor {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.decor-item {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.decor-empty {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: var(--text-3);
+  background: var(--surface-2);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+}
+
+/* Public Plaza in Habitat */
+.h-plaza {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(56,189,248,0.06));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid rgba(139,92,246,0.2);
+  border-radius: var(--radius-xl);
+  position: relative;
+  overflow: hidden;
+}
+.h-plaza::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, rgba(139,92,246,0.06), transparent 70%);
+  pointer-events: none;
+}
+
+.plaza-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+.plaza-name {
+  font-size: 18px; font-weight: 600;
+  color: var(--brand-2);
+  display: flex; align-items: center; gap: 8px;
+}
+.plaza-event {
+  font-size: 12px;
+  padding: 4px 12px;
+  background: rgba(245,158,11,0.12);
+  border: 1px solid rgba(245,158,11,0.25);
+  color: var(--gold);
+  border-radius: 999px;
+}
+
+.furniture-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  position: relative;
+  flex: 1;
+  align-content: center;
+}
+.f-slot {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: var(--radius);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.f-slot.filled {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.f-slot.filled:hover {
+  background: var(--surface-hover);
+  transform: translateY(-2px);
+}
+.f-slot.empty {
+  background: var(--surface-2);
+  border: 2px dashed var(--border);
+}
+.f-slot.empty:hover {
+  border-color: var(--brand);
+  background: rgba(139,92,246,0.06);
+}
+.f-slot.functional {
+  border-color: rgba(139,92,246,0.3);
+  background: rgba(139,92,246,0.06);
+}
+.f-slot-icon { font-size: 36px; }
+.f-slot-name { font-size: 11px; color: var(--text-3); }
+.f-slot-add { font-size: 24px; color: var(--text-3); }
+.f-slot-bonus {
+  font-size: 10px; font-weight: 600;
+  padding: 1px 8px;
+  background: rgba(139,92,246,0.15);
+  color: var(--brand-2);
+  border-radius: 999px;
+}
+
+.plaza-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  position: relative;
+}
+.plaza-stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-3);
+}
+.plaza-stat strong { color: var(--text); font-weight: 600; }
+
+/* ===== DETAIL PANEL (RIGHT) ===== */
+.detail-panel {
+  background: var(--surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+}
+.detail-panel::-webkit-scrollbar { width: 4px; }
+.detail-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.selected-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.si-icon {
+  width: 72px; height: 72px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 44px;
+  background: rgba(139,92,246,0.1);
+  border: 2px solid rgba(139,92,246,0.3);
+  border-radius: 50%;
+}
+.si-name { font-size: 16px; font-weight: 600; }
+.si-type {
+  font-size: 12px; font-weight: 500;
+  padding: 3px 12px;
+  background: rgba(139,92,246,0.15);
+  color: var(--brand-2);
+  border-radius: 999px;
+}
+.si-desc {
+  font-size: 12px; color: var(--text-3);
+  text-align: center; line-height: 1.6;
+}
+.si-effect {
+  width: 100%;
+  padding: 10px 12px;
+  background: rgba(16,185,129,0.08);
+  border: 1px solid rgba(16,185,129,0.2);
+  border-radius: var(--radius);
+  font-size: 13px; color: var(--green); font-weight: 500;
+  text-align: center;
+}
+
+.zone-info-list { display: flex; flex-direction: column; gap: 8px; }
+.zone-info-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 13px;
+}
+.zone-info-name { color: var(--text-2); }
+.zone-info-value { font-weight: 600; }
+.zone-info-value.high { color: var(--green); }
+.zone-info-value.mid { color: var(--gold); }
+.zone-info-value.low { color: var(--text-3); }
+
+.place-btn {
+  padding: 12px;
+  background: var(--brand);
+  border: none;
+  border-radius: var(--radius);
+  color: #fff;
+  font-size: 14px; font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px var(--brand-glow);
+}
+.place-btn:hover {
+  background: var(--brand-2);
+  transform: translateY(-1px);
+}
+
+/* ===== BOTTOM TOOLBAR ===== */
+.bottombar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 24px;
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+}
+.tool-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 20px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 14px; font-weight: 500;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tool-btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+.tool-btn.active {
+  background: rgba(139,92,246,0.15);
+  border-color: rgba(139,92,246,0.3);
+  color: var(--brand-2);
+}
+.tool-spacer { flex: 1; }
+.nav-tabs { display: flex; gap: 6px; }
+.nav-tab {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 18px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  color: var(--text-3);
+  font-size: 14px; font-weight: 500;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.nav-tab:hover { color: var(--text-2); background: var(--surface-2); }
+.nav-tab.active {
+  background: var(--brand);
+  color: #fff;
+  box-shadow: 0 4px 16px var(--brand-glow);
+}
+
+.score-display {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 16px;
+  background: rgba(245,158,11,0.12);
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: var(--radius);
+}
+.score-label { font-size: 13px; color: var(--text-3); }
+.score-value { font-size: 18px; font-weight: 700; color: var(--gold); font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== TOP BAR ===== -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="info-pill brand">
+        <span class="info-label">家园等级</span>
+        <span class="info-value">Lv.15</span>
+      </div>
+      <div class="info-pill green">
+        <span class="info-label">阶段</span>
+        <span class="info-value" style="font-size:14px">中型村落</span>
+      </div>
+      <div class="info-pill">
+        <span class="info-label">装饰总数</span>
+        <span class="info-value">18</span>
+      </div>
+    </div>
+    <div class="topbar-center">🌍 班级共享家园</div>
+    <div class="topbar-right">
+      <div class="theme-badge">🌿 森林主题 ▾</div>
+      <div class="score-display">
+        <span class="score-label">家园评分</span>
+        <span class="score-value">850</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="main-content">
+
+    <!-- LEFT: Furniture Inventory -->
+    <aside class="furniture-panel">
+      <div class="panel-title">📦 家具仓库</div>
+      <div class="category-tabs">
+        <button class="cat-tab active">全部</button>
+        <button class="cat-tab">功能型</button>
+        <button class="cat-tab">装饰型</button>
+      </div>
+      <div class="furniture-list">
+        <div class="furniture-card functional placed">
+          <div class="fc-icon">💎</div>
+          <div class="fc-name">能量水晶</div>
+          <span class="fc-tag functional">功能</span>
+          <div class="fc-placed-mark">✓</div>
+        </div>
+        <div class="furniture-card functional placed">
+          <div class="fc-icon">📚</div>
+          <div class="fc-name">智慧书架</div>
+          <span class="fc-tag functional">功能</span>
+          <div class="fc-placed-mark">✓</div>
+        </div>
+        <div class="furniture-card functional placed">
+          <div class="fc-icon">🎠</div>
+          <div class="fc-name">活力滑梯</div>
+          <span class="fc-tag functional">功能</span>
+          <div class="fc-placed-mark">✓</div>
+        </div>
+        <div class="furniture-card functional placed">
+          <div class="fc-icon">⛲</div>
+          <div class="fc-name">祝福喷泉</div>
+          <span class="fc-tag functional">功能</span>
+          <div class="fc-placed-mark">✓</div>
+        </div>
+        <div class="furniture-card">
+          <div class="fc-icon">🌸</div>
+          <div class="fc-name">花圃</div>
+          <span class="fc-tag decorative">装饰</span>
+        </div>
+        <div class="furniture-card">
+          <div class="fc-icon">🏮</div>
+          <div class="fc-name">灯笼</div>
+          <span class="fc-tag decorative">装饰</span>
+        </div>
+        <div class="furniture-card">
+          <div class="fc-icon">🚩</div>
+          <div class="fc-name">彩旗</div>
+          <span class="fc-tag decorative">装饰</span>
+        </div>
+        <div class="furniture-card">
+          <div class="fc-icon">🎀</div>
+          <div class="fc-name">蝴蝶结</div>
+          <span class="fc-tag decorative">装饰</span>
+        </div>
+        <div class="furniture-card">
+          <div class="fc-icon">🌼</div>
+          <div class="fc-name">小雏菊</div>
+          <span class="fc-tag decorative">装饰</span>
+        </div>
+        <div class="furniture-card">
+          <div class="fc-icon">🐛</div>
+          <div class="fc-name">虫虫屋</div>
+          <span class="fc-tag decorative">装饰</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER: Habitat Scene -->
+    <section class="habitat-scene">
+      <div class="scene-header">
+        <div class="scene-title">🗺️ 家园全景</div>
+        <div class="grid-indicator">📐 网格模式已开启</div>
+      </div>
+
+      <div class="scene-grid">
+        <!-- Group 1 Zone -->
+        <div class="h-zone g1">
+          <div class="h-zone-header">
+            <span class="h-zone-name">第1组区域</span>
+            <span class="h-zone-beauty">★★☆</span>
+          </div>
+          <div class="h-zone-body">
+            <div class="h-zone-pet">🦅</div>
+            <div class="h-zone-decor">
+              <div class="decor-item">🌸</div>
+              <div class="decor-item">🐛</div>
+              <div class="decor-empty">+</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Public Plaza -->
+        <div class="h-plaza">
+          <div class="plaza-header">
+            <div class="plaza-name">🏛️ 公共广场</div>
+            <div class="plaza-event">🎉 进化仪式举办地</div>
+          </div>
+
+          <div class="furniture-grid">
+            <div class="f-slot filled functional">
+              <div class="f-slot-icon">💎</div>
+              <div class="f-slot-name">能量水晶</div>
+              <span class="f-slot-bonus">+5/日</span>
+            </div>
+            <div class="f-slot filled functional">
+              <div class="f-slot-icon">📚</div>
+              <div class="f-slot-name">智慧书架</div>
+              <span class="f-slot-bonus">智慧+10%</span>
+            </div>
+            <div class="f-slot filled functional">
+              <div class="f-slot-icon">🎠</div>
+              <div class="f-slot-name">活力滑梯</div>
+              <span class="f-slot-bonus">精力+15%</span>
+            </div>
+            <div class="f-slot filled functional">
+              <div class="f-slot-icon">⛲</div>
+              <div class="f-slot-name">祝福喷泉</div>
+              <span class="f-slot-bonus">心情+5%</span>
+            </div>
+            <div class="f-slot empty">
+              <div class="f-slot-add">+</div>
+              <div class="f-slot-name">空位</div>
+            </div>
+            <div class="f-slot empty">
+              <div class="f-slot-add">+</div>
+              <div class="f-slot-name">空位</div>
+            </div>
+          </div>
+
+          <div class="plaza-footer">
+            <div class="plaza-stat">已放置 <strong>4</strong></div>
+            <div class="plaza-stat">空位 <strong>2</strong></div>
+            <div class="plaza-stat">综合加成 <strong>+30%</strong></div>
+          </div>
+        </div>
+
+        <!-- Group 2 Zone -->
+        <div class="h-zone g2">
+          <div class="h-zone-header">
+            <span class="h-zone-name">第2组区域</span>
+            <span class="h-zone-beauty">★☆☆</span>
+          </div>
+          <div class="h-zone-body">
+            <div class="h-zone-pet">🐢</div>
+            <div class="h-zone-decor">
+              <div class="decor-item">🏮</div>
+              <div class="decor-empty">+</div>
+              <div class="decor-empty">+</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Group 3 Zone -->
+        <div class="h-zone g3">
+          <div class="h-zone-header">
+            <span class="h-zone-name">第3组区域</span>
+            <span class="h-zone-beauty">★★★</span>
+          </div>
+          <div class="h-zone-body">
+            <div class="h-zone-pet">🦊</div>
+            <div class="h-zone-decor">
+              <div class="decor-item">🚩</div>
+              <div class="decor-item">🌼</div>
+              <div class="decor-item">🎀</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Group 4 Zone -->
+        <div class="h-zone g4">
+          <div class="h-zone-header">
+            <span class="h-zone-name">第4组区域</span>
+            <span class="h-zone-beauty">★☆☆</span>
+          </div>
+          <div class="h-zone-body">
+            <div class="h-zone-pet">🦋</div>
+            <div class="h-zone-decor">
+              <div class="decor-item">🎀</div>
+              <div class="decor-empty">+</div>
+              <div class="decor-empty">+</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Detail Panel -->
+    <aside class="detail-panel">
+      <div class="panel-title">📋 选中详情</div>
+      <div class="selected-item">
+        <div class="si-icon">🌸</div>
+        <div class="si-name">花圃</div>
+        <span class="si-type">装饰型家具</span>
+        <div class="si-desc">为家园增添一抹自然色彩<br>提升家园综合评分</div>
+        <div class="si-effect">家园评分 +15</div>
+      </div>
+      <button class="place-btn">📍 放置到家园</button>
+
+      <div class="panel-title">📊 区域美观度</div>
+      <div class="zone-info-list">
+        <div class="zone-info-item">
+          <span class="zone-info-name">第1组区域</span>
+          <span class="zone-info-value mid">★★☆</span>
+        </div>
+        <div class="zone-info-item">
+          <span class="zone-info-name">第2组区域</span>
+          <span class="zone-info-value low">★☆☆</span>
+        </div>
+        <div class="zone-info-item">
+          <span class="zone-info-name">第3组区域</span>
+          <span class="zone-info-value high">★★★</span>
+        </div>
+        <div class="zone-info-item">
+          <span class="zone-info-name">第4组区域</span>
+          <span class="zone-info-value low">★☆☆</span>
+        </div>
+        <div class="zone-info-item">
+          <span class="zone-info-name">公共广场</span>
+          <span class="zone-info-value high">★★★</span>
+        </div>
+      </div>
+
+      <div class="panel-title">💡 提示</div>
+      <div style="font-size:12px;color:var(--text-3);line-height:1.7;padding:8px 12px;background:var(--surface-2);border-radius:var(--radius);border:1px solid var(--border);">
+        引导全班讨论布置方案，如"花圃放哪组区域？"增强参与感。功能型家具优先放置在公共广场，全班共享加成。
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- ===== BOTTOM TOOLBAR ===== -->
+  <footer class="bottombar">
+    <button class="tool-btn">🛒 装饰商店</button>
+    <button class="tool-btn active">📦 家具仓库</button>
+    <button class="tool-btn">✏️ 布局编辑</button>
+    <button class="tool-btn">🎨 主题切换</button>
+    <div class="tool-spacer"></div>
+    <div class="score-display">
+      <span class="score-label">已用/总计</span>
+      <span class="score-value" style="font-size:14px">18 / 30</span>
+    </div>
+    <div class="nav-tabs">
+      <button class="nav-tab">🏠 主页</button>
+      <button class="nav-tab active">🌍 家园</button>
+      <button class="nav-tab">🗺️ 探索</button>
+      <button class="nav-tab">📖 图鉴</button>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>
