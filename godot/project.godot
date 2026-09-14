@@ -22,6 +22,7 @@ AppState="*res://autoload/AppState.gd"
 ThemeConfig="*res://autoload/ThemeConfig.gd"
 MCPRuntime="*res://addons/godot_mcp/mcp_runtime.gd"
 PetState="*res://autoload/PetState.gd"
+Modal="*res://autoload/Modal.gd"
 
 [display]
 

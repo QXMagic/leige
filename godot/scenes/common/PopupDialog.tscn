@@ -1,0 +1,162 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/common/PopupDialog.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://resource/ui/popup_panel.png" id="2_panel"]
+[ext_resource type="Texture2D" path="res://resource/ui/btn_red.png" id="3_red"]
+[ext_resource type="Texture2D" path="res://resource/ui/btn_green.png" id="4_green"]
+[ext_resource type="Texture2D" path="res://resource/ui/btn_close.png" id="5_close"]
+
+[node name="PopupDialog" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.2, 0.11, 0.06, 0.62)
+
+[node name="Panel" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -555.0
+offset_top = -435.5
+offset_right = 555.0
+offset_bottom = 435.5
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.85, 0.85)
+pivot_offset = Vector2(555, 435.5)
+mouse_filter = 0
+texture = ExtResource("2_panel")
+
+[node name="Title" type="Label" parent="Panel"]
+layout_mode = 0
+offset_left = 250.0
+offset_top = 40.0
+offset_right = 870.0
+offset_bottom = 145.0
+theme_override_colors/font_color = Color(0.9529412, 0.827451, 0.6901961, 1)
+theme_override_colors/font_outline_color = Color(0.5411765, 0.30980393, 0.17254902, 1)
+theme_override_constants/outline_size = 14
+theme_override_font_sizes/font_size = 54
+text = "提示"
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="Message" type="Label" parent="Panel"]
+layout_mode = 0
+offset_left = 130.0
+offset_top = 200.0
+offset_right = 990.0
+offset_bottom = 590.0
+theme_override_colors/font_color = Color(0.41960785, 0.14117648, 0.0627451, 1)
+theme_override_font_sizes/font_size = 42
+text = "这里是弹窗内容"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+text_overrun_behavior = 3
+
+[node name="Buttons" type="HBoxContainer" parent="Panel"]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 655.0
+offset_right = 1030.0
+offset_bottom = 815.0
+mouse_filter = 2
+theme_override_constants/separation = 70
+alignment = 1
+
+[node name="CancelSlot" type="Control" parent="Panel/Buttons"]
+custom_minimum_size = Vector2(380, 147)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="CancelButton" type="TextureButton" parent="Panel/Buttons/CancelSlot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+texture_normal = ExtResource("3_red")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Label" type="Label" parent="Panel/Buttons/CancelSlot/CancelButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.9529412, 0.85882354, 1)
+theme_override_colors/font_outline_color = Color(0.35, 0.16, 0.08, 0.6)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 48
+text = "取消"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ConfirmSlot" type="Control" parent="Panel/Buttons"]
+custom_minimum_size = Vector2(380, 147)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="ConfirmButton" type="TextureButton" parent="Panel/Buttons/ConfirmSlot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+texture_normal = ExtResource("4_green")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Label" type="Label" parent="Panel/Buttons/ConfirmSlot/ConfirmButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.9529412, 0.85882354, 1)
+theme_override_colors/font_outline_color = Color(0.25, 0.35, 0.08, 0.6)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 48
+text = "确定"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CloseButton" type="TextureButton" parent="Panel"]
+visible = false
+layout_mode = 0
+offset_left = 1020.0
+offset_top = 95.0
+offset_right = 1100.0
+offset_bottom = 174.0
+focus_mode = 0
+texture_normal = ExtResource("5_close")
+ignore_texture_size = true
+stretch_mode = 0

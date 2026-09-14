@@ -8,6 +8,7 @@ extends Control
 signal finished()
 
 const PetScript = preload("res://scenes/pet/Pet.gd")
+const FoodFly = preload("res://scenes/common/FoodFly.gd")
 
 ## Milliseconds of loading allowed per rendered frame.
 const BUDGET_MS := 8
@@ -24,6 +25,9 @@ const UI_TEXTURES := [
 	"res://resource/ui/btn_feed.png",
 	"res://resource/ui/btn_close.png",
 	"res://resource/ui/shadow.png",
+	"res://resource/ui/popup_panel.png",
+	"res://resource/ui/btn_red.png",
+	"res://resource/ui/btn_green.png",
 	"res://resource/sprites/illustration.png",
 ]
 
@@ -33,6 +37,7 @@ const SCENES := [
 	"res://scenes/home/MainHome.tscn",
 	"res://scenes/sanctuary/Sanctuary.tscn",
 	"res://scenes/sanctuary/AdoptDialog.tscn",
+	"res://scenes/common/PopupDialog.tscn",
 ]
 
 @onready var _fill: Panel = $BarTrack/BarFill
@@ -51,7 +56,7 @@ var _emitted: bool = false
 func _ready() -> void:
 	_pet.visible = false
 	_shadow.visible = false
-	for path in UI_TEXTURES:
+	for path in UI_TEXTURES + FoodFly.all_textures():
 		_tasks.append(["res", path])
 	for path in SCENES:
 		_tasks.append(["res", path])

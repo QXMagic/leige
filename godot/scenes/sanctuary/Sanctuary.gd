@@ -7,12 +7,14 @@ extends Control
 signal closed()
 
 const ADOPT_DIALOG_SCENE := "res://scenes/sanctuary/AdoptDialog.tscn"
+const PLACE_DELAY := 0.25
 
 @onready var _grid: GridContainer = $Panel/GridArea/Grid
 @onready var _close: TextureButton = $CloseButton
 @onready var _state: Node = get_node("/root/PetState")
 
 var _dialog: Control = null
+var _leaving: bool = false
 
 
 func _ready() -> void:
@@ -21,7 +23,7 @@ func _ready() -> void:
 		var cell: Control = _grid.get_child(i)
 		cell.feed_pressed.connect(_on_feed)
 		cell.add_pressed.connect(_on_add.bind(i))
-		cell.selected.connect(_on_selected.bind(i))
+		cell.place_requested.connect(_on_place_requested.bind(i))
 	_state.roster_changed.connect(_on_roster_changed)
 	_state.active_changed.connect(_on_active_changed)
 	_refresh()
@@ -51,9 +53,15 @@ func _on_feed(_cell: Control) -> void:
 	pass  # the cell already plays its eat animation
 
 
-## Clicking an occupied pen makes that pet the one roaming the home lawn.
-func _on_selected(_cell: Control, index: int) -> void:
+## Double-clicking an occupied pen puts that pet on the home lawn and heads
+## back there. The short pause lets the highlight visibly jump to the new pen.
+func _on_place_requested(_cell: Control, index: int) -> void:
+	if _leaving:
+		return
+	_leaving = true
 	_state.set_active(index)
+	await get_tree().create_timer(PLACE_DELAY).timeout
+	closed.emit()
 
 
 func _on_add(_cell: Control, index: int) -> void:
