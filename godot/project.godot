@@ -20,9 +20,12 @@ config/icon="res://icon.svg"
 ApiClient="*res://autoload/ApiClient.gd"
 AppState="*res://autoload/AppState.gd"
 ThemeConfig="*res://autoload/ThemeConfig.gd"
+ClientId="*res://autoload/ClientId.gd"
 MCPRuntime="*res://addons/godot_mcp/mcp_runtime.gd"
 PetState="*res://autoload/PetState.gd"
 Modal="*res://autoload/Modal.gd"
+ScoreState="*res://autoload/ScoreState.gd"
+CloudSave="*res://autoload/CloudSave.gd"
 
 [display]
 

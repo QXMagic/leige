@@ -33,6 +33,9 @@ const UI_TEXTURES := [
 
 const SCENES := [
 	"res://scenes/common/PetCell.tscn",
+	"res://scenes/common/ChoiceMenu.tscn",
+	"res://scenes/common/GroupPlate.tscn",
+	"res://scenes/home/RankBoard.tscn",
 	"res://scenes/common/AdoptSlot.tscn",
 	"res://scenes/home/MainHome.tscn",
 	"res://scenes/sanctuary/Sanctuary.tscn",
@@ -83,10 +86,14 @@ func _process(delta: float) -> void:
 	# Advance at whichever is slower: real work, or the minimum display time.
 	# That way the bar never sits at 100% waiting, and never flashes past.
 	var work := float(_done) / float(_total)
+	# 云存档还没回来就停在 95%，别在 100% 上干等。
+	var cloud_ready := CloudSave.boot_done or _elapsed >= CloudSave.BOOT_WAIT_SECONDS
+	if not cloud_ready:
+		work = minf(work, 0.95)
 	var floor_progress := _elapsed / MIN_SECONDS
 	_set_progress(minf(work, floor_progress))
 
-	if _tasks.is_empty() and _elapsed >= MIN_SECONDS and not _emitted:
+	if _tasks.is_empty() and _elapsed >= MIN_SECONDS and cloud_ready and not _emitted:
 		_emitted = true
 		set_process(false)
 		finished.emit()

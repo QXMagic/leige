@@ -1,19 +1,25 @@
 extends Control
-## "PET SANCTUARY MANAGEMENT" screen — reference: resource/references/preview_2.jpg
+## "PET SANCTUARY MANAGEMENT" 界面 —— 参考 resource/references/preview_2.jpg
 ##
-## Reads its roster from the PetState autoload, so adoptions and the picked pet
-## survive navigating back to the home screen.
+## 网格的 4 列就是班级的 4 个小组，每列 3 个栏位是这个小组的宠物栏。列头显示
+## 组名和剩余积分。FEED 要花这一列小组的积分，宠物吃了才长能量；双击栏位把这
+## 只宠物换到草地上当本组的出场宠物。
 
 signal closed()
 
 const ADOPT_DIALOG_SCENE := "res://scenes/sanctuary/AdoptDialog.tscn"
+const CHOICE_MENU_SCENE := "res://scenes/common/ChoiceMenu.tscn"
 const PLACE_DELAY := 0.25
+## 投喂菜单开在这个栏位上方多高的位置。
+const MENU_ANCHOR := Vector2(198, 40)
 
 @onready var _grid: GridContainer = $Panel/GridArea/Grid
+@onready var _headers: Control = $Panel/Headers
 @onready var _close: TextureButton = $CloseButton
 @onready var _state: Node = get_node("/root/PetState")
 
 var _dialog: Control = null
+var _menu: Control = null
 var _leaving: bool = false
 
 
@@ -21,11 +27,16 @@ func _ready() -> void:
 	_close.pressed.connect(func(): closed.emit())
 	for i in _grid.get_child_count():
 		var cell: Control = _grid.get_child(i)
-		cell.feed_pressed.connect(_on_feed)
+		cell.feed_pressed.connect(_on_feed.bind(i))
 		cell.add_pressed.connect(_on_add.bind(i))
 		cell.place_requested.connect(_on_place_requested.bind(i))
-	_state.roster_changed.connect(_on_roster_changed)
-	_state.active_changed.connect(_on_active_changed)
+		cell.rename_pressed.connect(_on_rename.bind(i))
+	_state.roster_changed.connect(func(_roster): _refresh())
+	_state.lawn_changed.connect(func(_lawn): _refresh())
+	_state.pet_energy_changed.connect(func(_i, _e): _refresh())
+	ScoreState.points_changed.connect(func(_g, _d, _t, _l, _u): _refresh_headers())
+	ScoreState.fed.connect(func(_g, _i, _c, _gain, _u): _refresh_headers())
+	ScoreState.group_renamed.connect(func(_g, _n): _refresh_headers())
 	_refresh()
 
 
@@ -36,30 +47,62 @@ func _refresh() -> void:
 		if d.is_empty():
 			cell.setup("", "", true)
 		else:
-			cell.setup(str(d.get("name", "")), str(d.get("type", "cat")), false)
-		cell.set_selected(i == _state.active_index)
+			cell.setup(str(d.get("name", "")), str(d.get("type", "cat")), false,
+				_state.energy_of(i))
+		cell.set_selected(_state.is_on_lawn(i))
+	_refresh_headers()
 
 
-func _on_roster_changed(_roster: Array) -> void:
-	_refresh()
+## 列头：这一列属于哪个小组，还剩多少积分可以用来投喂。
+func _refresh_headers() -> void:
+	for group in _state.GROUP_COUNT:
+		var label: Label = _headers.get_node("Group%d" % (group + 1))
+		label.text = "%s · %d分" % [ScoreState.group_name(group), ScoreState.points(group)]
 
 
-func _on_active_changed(index: int, _pet: Dictionary) -> void:
-	for i in _grid.get_child_count():
-		_grid.get_child(i).set_selected(i == index)
+# ---- 投喂 ---------------------------------------------------------------
+
+## FEED 打开这一组的食物菜单，买得起的才点得动。
+func _on_feed(cell: Control, index: int) -> void:
+	if _menu and is_instance_valid(_menu):
+		_close_menu()
+		return
+	var group: int = _state.group_of(index)
+	var items: Array = []
+	for f: Dictionary in ScoreState.FOODS:
+		items.append({
+			"id": str(f["id"]),
+			"label": str(f["label"]),
+			"note": "%d分 → +%d能量" % [int(f["cost"]), int(f["energy"])],
+			"positive": true,
+			"disabled": not ScoreState.can_afford(group, str(f["id"])),
+		})
+	_menu = (load(CHOICE_MENU_SCENE) as PackedScene).instantiate()
+	add_child(_menu)
+	_menu.setup("投喂 %s · %s %d分" % [cell.pet_name, ScoreState.group_name(group),
+		ScoreState.points(group)], items, cell.global_position + MENU_ANCHOR)
+	_menu.picked.connect(func(food_id: String):
+		if ScoreState.feed(index, food_id):
+			cell.feed()
+		_close_menu())
+	_menu.closed.connect(_close_menu)
 
 
-func _on_feed(_cell: Control) -> void:
-	pass  # the cell already plays its eat animation
+func _close_menu() -> void:
+	if _menu and is_instance_valid(_menu):
+		_menu.queue_free()
+	_menu = null
 
 
-## Double-clicking an occupied pen puts that pet on the home lawn and heads
-## back there. The short pause lets the highlight visibly jump to the new pen.
+# ---- 上场、领养、改名 ---------------------------------------------------
+
+## 双击占用中的栏位，把这只宠物换成本组在草地上的出场宠物，然后回主场景。
+## 停顿一下是为了让高亮看得见地跳过去。
 func _on_place_requested(_cell: Control, index: int) -> void:
 	if _leaving:
 		return
 	_leaving = true
-	_state.set_active(index)
+	_state.place_on_lawn(index)
 	await get_tree().create_timer(PLACE_DELAY).timeout
 	closed.emit()
 
@@ -74,8 +117,25 @@ func _on_add(_cell: Control, index: int) -> void:
 
 
 func _on_adopted(pet_type: String, pet_name: String, index: int) -> void:
-	_state.adopt(index, pet_type, pet_name)
+	var ok: bool = _state.adopt(index, pet_type, pet_name)
 	_close_dialog()
+	if ok:
+		_prompt_name(index, "给新伙伴取名", "欢迎回家！给它起个名字吧", "就叫这个")
+
+
+func _on_rename(_cell: Control, index: int) -> void:
+	_prompt_name(index, "宠物改名", "给 %s 起个新名字吧" % _state.pet_at(index).get("name", ""))
+
+
+## 取消就保留原来的名字。
+func _prompt_name(index: int, title: String, message: String, confirm_text: String = "确定") -> void:
+	if _leaving or Modal.has_open() or _state.is_empty_slot(index):
+		return
+	var new_name: Variant = await Modal.prompt(title, message,
+		str(_state.pet_at(index).get("name", "")), "输入宠物名字",
+		_state.NAME_MAX_LENGTH, _state.validate_name.bind(index), confirm_text)
+	if new_name != null and is_instance_valid(self):
+		_state.rename(index, new_name)
 
 
 func _close_dialog() -> void:

@@ -5,6 +5,9 @@
 [ext_resource type="Texture2D" uid="uid://bf0pb4grb10ko" path="res://resource/ui/btn_close.png" id="3_24n2f"]
 [ext_resource type="Texture2D" uid="uid://cdyrxmrbu6k63" path="res://resource/ui/shadow.png" id="3_aw3bj"]
 [ext_resource type="Script" uid="uid://b5n4jpeg4vwc6" path="res://scenes/pet/PetView.gd" id="4_npvya"]
+[ext_resource type="PackedScene" path="res://scenes/common/GroupPlate.tscn" id="5_plate"]
+[ext_resource type="PackedScene" path="res://scenes/home/RankBoard.tscn" id="6_rank"]
+[ext_resource type="Texture2D" path="res://resource/ui/btn_red.png" id="7_red"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_24n2f"]
 
@@ -42,40 +45,247 @@ texture = ExtResource("2_snw6s")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Shadow" type="TextureRect" parent="." unique_id=798235744]
+[node name="Pets" type="Control" parent="." unique_id=1320461001]
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="Spot2" type="Control" parent="Pets" unique_id=1320461020]
+anchors_preset = 0
+offset_left = 580.0
+offset_top = 645.0
+offset_right = 580.0
+offset_bottom = 645.0
+scale = Vector2(0.8, 0.8)
+mouse_filter = 2
+
+[node name="Shadow" type="TextureRect" parent="Pets/Spot2" unique_id=1320461021]
 modulate = Color(1, 1, 1, 0.3)
 layout_mode = 0
-offset_left = 315.0
-offset_top = 882.0
-offset_right = 437.0
-offset_bottom = 914.0
+offset_left = -61.0
+offset_top = -16.0
+offset_right = 61.0
+offset_bottom = 16.0
 mouse_filter = 2
 texture = ExtResource("3_aw3bj")
 expand_mode = 1
 
-[node name="Pet" type="Control" parent="." unique_id=1856919629]
+[node name="Pet" type="Control" parent="Pets/Spot2" unique_id=1320461022]
 anchors_preset = 0
-offset_left = 199.0
-offset_top = 684.0
-offset_right = 485.0
-offset_bottom = 970.0
+offset_left = -177.0
+offset_top = -214.0
+offset_right = 109.0
+offset_bottom = 72.0
 mouse_filter = 2
 script = ExtResource("4_npvya")
 pet_type = "panda"
 target_size = 280.28
 
-[node name="PetHit" type="Button" parent="." unique_id=227390963]
+[node name="Hit" type="Button" parent="Pets/Spot2" unique_id=1320461023]
 layout_mode = 0
-offset_left = 300.0
-offset_top = 768.0
-offset_right = 452.0
-offset_bottom = 910.0
+offset_left = -76.0
+offset_top = -130.0
+offset_right = 76.0
+offset_bottom = 12.0
 theme_override_styles/normal = SubResource("StyleBoxEmpty_24n2f")
 theme_override_styles/pressed = SubResource("StyleBoxEmpty_aw3bj")
 theme_override_styles/hover = SubResource("StyleBoxEmpty_npvya")
 theme_override_styles/disabled = SubResource("StyleBoxEmpty_n7yhl")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_2vfet")
 flat = true
+
+[node name="GroupPlate" parent="Pets/Spot2" instance=ExtResource("5_plate")]
+layout_mode = 0
+offset_left = -140.0
+offset_top = 14.0
+offset_right = 140.0
+offset_bottom = 130.0
+
+[node name="Spot3" type="Control" parent="Pets" unique_id=1320461030]
+anchors_preset = 0
+offset_left = 1270.0
+offset_top = 780.0
+offset_right = 1270.0
+offset_bottom = 780.0
+scale = Vector2(0.9, 0.9)
+mouse_filter = 2
+
+[node name="Shadow" type="TextureRect" parent="Pets/Spot3" unique_id=1320461031]
+modulate = Color(1, 1, 1, 0.3)
+layout_mode = 0
+offset_left = -61.0
+offset_top = -16.0
+offset_right = 61.0
+offset_bottom = 16.0
+mouse_filter = 2
+texture = ExtResource("3_aw3bj")
+expand_mode = 1
+
+[node name="Pet" type="Control" parent="Pets/Spot3" unique_id=1320461032]
+anchors_preset = 0
+offset_left = -177.0
+offset_top = -214.0
+offset_right = 109.0
+offset_bottom = 72.0
+mouse_filter = 2
+script = ExtResource("4_npvya")
+pet_type = "panda"
+target_size = 280.28
+
+[node name="Hit" type="Button" parent="Pets/Spot3" unique_id=1320461033]
+layout_mode = 0
+offset_left = -76.0
+offset_top = -130.0
+offset_right = 76.0
+offset_bottom = 12.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_24n2f")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_aw3bj")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_npvya")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_n7yhl")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_2vfet")
+flat = true
+
+[node name="GroupPlate" parent="Pets/Spot3" instance=ExtResource("5_plate")]
+layout_mode = 0
+offset_left = -140.0
+offset_top = 14.0
+offset_right = 140.0
+offset_bottom = 130.0
+
+[node name="Spot1" type="Control" parent="Pets" unique_id=1856919629]
+anchors_preset = 0
+offset_left = 376.0
+offset_top = 870.0
+offset_right = 376.0
+offset_bottom = 870.0
+mouse_filter = 2
+
+[node name="Shadow" type="TextureRect" parent="Pets/Spot1" unique_id=798235744]
+modulate = Color(1, 1, 1, 0.3)
+layout_mode = 0
+offset_left = -61.0
+offset_top = -16.0
+offset_right = 61.0
+offset_bottom = 16.0
+mouse_filter = 2
+texture = ExtResource("3_aw3bj")
+expand_mode = 1
+
+[node name="Pet" type="Control" parent="Pets/Spot1" unique_id=1320461012]
+anchors_preset = 0
+offset_left = -177.0
+offset_top = -214.0
+offset_right = 109.0
+offset_bottom = 72.0
+mouse_filter = 2
+script = ExtResource("4_npvya")
+pet_type = "panda"
+target_size = 280.28
+
+[node name="Hit" type="Button" parent="Pets/Spot1" unique_id=227390963]
+layout_mode = 0
+offset_left = -76.0
+offset_top = -130.0
+offset_right = 76.0
+offset_bottom = 12.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_24n2f")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_aw3bj")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_npvya")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_n7yhl")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_2vfet")
+flat = true
+
+[node name="GroupPlate" parent="Pets/Spot1" instance=ExtResource("5_plate")]
+layout_mode = 0
+offset_left = -140.0
+offset_top = 14.0
+offset_right = 140.0
+offset_bottom = 130.0
+
+[node name="Spot4" type="Control" parent="Pets" unique_id=1320461040]
+anchors_preset = 0
+offset_left = 880.0
+offset_top = 935.0
+offset_right = 880.0
+offset_bottom = 935.0
+mouse_filter = 2
+
+[node name="Shadow" type="TextureRect" parent="Pets/Spot4" unique_id=1320461041]
+modulate = Color(1, 1, 1, 0.3)
+layout_mode = 0
+offset_left = -61.0
+offset_top = -16.0
+offset_right = 61.0
+offset_bottom = 16.0
+mouse_filter = 2
+texture = ExtResource("3_aw3bj")
+expand_mode = 1
+
+[node name="Pet" type="Control" parent="Pets/Spot4" unique_id=1320461042]
+anchors_preset = 0
+offset_left = -177.0
+offset_top = -214.0
+offset_right = 109.0
+offset_bottom = 72.0
+mouse_filter = 2
+script = ExtResource("4_npvya")
+pet_type = "panda"
+target_size = 280.28
+
+[node name="Hit" type="Button" parent="Pets/Spot4" unique_id=1320461043]
+layout_mode = 0
+offset_left = -76.0
+offset_top = -130.0
+offset_right = 76.0
+offset_bottom = 12.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_24n2f")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_aw3bj")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_npvya")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_n7yhl")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_2vfet")
+flat = true
+
+[node name="GroupPlate" parent="Pets/Spot4" instance=ExtResource("5_plate")]
+layout_mode = 0
+offset_left = -140.0
+offset_top = 14.0
+offset_right = 140.0
+offset_bottom = 130.0
+
+[node name="RankBoard" parent="." instance=ExtResource("6_rank")]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 40.0
+offset_right = 420.0
+offset_bottom = 384.0
+
+[node name="UndoButton" type="TextureButton" parent="." unique_id=1320461050]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 404.0
+offset_right = 260.0
+offset_bottom = 488.0
+tooltip_text = "撤销上一次加减分"
+focus_mode = 0
+texture_normal = ExtResource("7_red")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Label" type="Label" parent="UndoButton" unique_id=1320461051]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.9529412, 0.85882354, 1)
+theme_override_colors/font_outline_color = Color(0.35, 0.16, 0.08, 0.6)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 38
+text = "撤销"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="HouseHotspot" type="Button" parent="." unique_id=2086114768]
 layout_mode = 0

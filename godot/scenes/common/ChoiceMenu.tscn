@@ -1,0 +1,64 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/common/ChoiceMenu.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+content_margin_left = 22.0
+content_margin_top = 20.0
+content_margin_right = 22.0
+content_margin_bottom = 22.0
+bg_color = Color(0.90588236, 0.72156864, 0.5568628, 1)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0.78431374, 0.53333336, 0.36078432, 1)
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+shadow_color = Color(0.25, 0.13, 0.06, 0.35)
+shadow_size = 12
+
+[node name="ChoiceMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.2, 0.11, 0.06, 0.3)
+
+[node name="Panel" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 0
+offset_left = 760.0
+offset_top = 240.0
+offset_right = 1160.0
+offset_bottom = 840.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Content" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="Panel/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.41960785, 0.14117648, 0.0627451, 1)
+theme_override_font_sizes/font_size = 34
+text = "第1组 · 加减分"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="List" type="VBoxContainer" parent="Panel/Content"]
+layout_mode = 2
+theme_override_constants/separation = 12

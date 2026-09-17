@@ -48,6 +48,70 @@ text = "PET SANCTUARY MANAGEMENT"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="Headers" type="Control" parent="Panel" unique_id=1716205000]
+anchors_preset = 0
+offset_left = 69.0
+offset_top = 130.0
+offset_right = 1710.0
+offset_bottom = 174.0
+mouse_filter = 2
+
+[node name="Group1" type="Label" parent="Panel/Headers" unique_id=1716205001]
+layout_mode = 0
+offset_left = 0.0
+offset_right = 396.0
+offset_bottom = 44.0
+theme_override_colors/font_color = Color(0.9529412, 0.827451, 0.6901961, 1)
+theme_override_colors/font_outline_color = Color(0.35, 0.18, 0.08, 0.7)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 30
+text = "第1组 · 0分"
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="Group2" type="Label" parent="Panel/Headers" unique_id=1716205002]
+layout_mode = 0
+offset_left = 415.0
+offset_right = 811.0
+offset_bottom = 44.0
+theme_override_colors/font_color = Color(0.9529412, 0.827451, 0.6901961, 1)
+theme_override_colors/font_outline_color = Color(0.35, 0.18, 0.08, 0.7)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 30
+text = "第2组 · 0分"
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="Group3" type="Label" parent="Panel/Headers" unique_id=1716205003]
+layout_mode = 0
+offset_left = 830.0
+offset_right = 1226.0
+offset_bottom = 44.0
+theme_override_colors/font_color = Color(0.9529412, 0.827451, 0.6901961, 1)
+theme_override_colors/font_outline_color = Color(0.35, 0.18, 0.08, 0.7)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 30
+text = "第3组 · 0分"
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="Group4" type="Label" parent="Panel/Headers" unique_id=1716205004]
+layout_mode = 0
+offset_left = 1245.0
+offset_right = 1641.0
+offset_bottom = 44.0
+theme_override_colors/font_color = Color(0.9529412, 0.827451, 0.6901961, 1)
+theme_override_colors/font_outline_color = Color(0.35, 0.18, 0.08, 0.7)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 30
+text = "第4组 · 0分"
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
 [node name="GridArea" type="Control" parent="Panel" unique_id=1490163711]
 anchors_preset = 0
 offset_left = 69.0

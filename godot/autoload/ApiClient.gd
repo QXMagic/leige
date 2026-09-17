@@ -32,29 +32,39 @@ func _request(endpoint: String, method: int, body: Dictionary) -> void:
 	if mock_mode:
 		call_deferred("_mock_response", endpoint)
 		return
+	send(method, endpoint, body, func(ok: bool, _code: int, data: Variant, msg: String):
+		if ok:
+			emit_signal("request_completed", endpoint, data)
+		else:
+			emit_signal("request_failed", endpoint, msg if msg != "" else "unknown error")
+	)
 
-	var full_url := base_url + endpoint
+
+## 回调版请求，不经过 mock。结果只交给 on_done，不走全局信号，几个请求同时在
+## 路上也不会互相认错。on_done(ok, code, data, msg)：code 是服务端业务码，
+## -1 表示 token 失效，网络或解析失败时为 0。
+func send(method: int, endpoint: String, body: Dictionary, on_done: Callable, timeout: float = HTTP_TIMEOUT) -> void:
 	var http := HTTPRequest.new()
-	http.timeout = HTTP_TIMEOUT
+	http.timeout = timeout
 	add_child(http)
 
-	http.request_completed.connect(func(_result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray):
+	http.request_completed.connect(func(result: int, response_code: int, _headers: PackedStringArray, raw: PackedByteArray):
 		http.queue_free()
-		if response_code != 200:
-			emit_signal("request_failed", endpoint, "HTTP %d" % response_code)
+		if result != HTTPRequest.RESULT_SUCCESS:
+			on_done.call(false, 0, null, "network err %d" % result)
 			return
-		var text: String = body.get_string_from_utf8()
-		var parsed: Variant = JSON.parse_string(text)
+		if response_code != 200:
+			on_done.call(false, 0, null, "HTTP %d" % response_code)
+			return
+		var parsed: Variant = JSON.parse_string(raw.get_string_from_utf8())
 		if parsed == null:
-			emit_signal("request_failed", endpoint, "JSON parse error")
+			on_done.call(false, 0, null, "JSON parse error")
 			return
 		if typeof(parsed) == TYPE_DICTIONARY and parsed.has("code"):
-			if parsed["code"] == 1 or parsed["code"] == 200:
-				emit_signal("request_completed", endpoint, parsed.get("data", {}))
-			else:
-				emit_signal("request_failed", endpoint, parsed.get("msg", "unknown error"))
+			var code := int(parsed["code"])
+			on_done.call(code == 1 or code == 200, code, parsed.get("data", {}), str(parsed.get("msg", "")))
 		else:
-			emit_signal("request_completed", endpoint, parsed)
+			on_done.call(true, 1, parsed, "")
 	)
 
 	var headers := ["Content-Type: application/json"]
@@ -62,10 +72,10 @@ func _request(endpoint: String, method: int, body: Dictionary) -> void:
 		headers.append("token: " + api_token)
 
 	var body_str := JSON.stringify(body) if not body.is_empty() else ""
-	var err := http.request(full_url, headers, method, body_str)
+	var err := http.request(base_url + endpoint, headers, method, body_str)
 	if err != OK:
 		http.queue_free()
-		emit_signal("request_failed", endpoint, "request err %d" % err)
+		on_done.call(false, 0, null, "request err %d" % err)
 
 func _build_query(params: Dictionary) -> String:
 	if params.is_empty():

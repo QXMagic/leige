@@ -6,6 +6,8 @@ signal feed_pressed(cell: Control)
 signal add_pressed(cell: Control)
 ## Double-click / double-tap on an occupied pen: put this pet on the home lawn.
 signal place_requested(cell: Control)
+## Click on the name plate of an occupied pen: rename this pet.
+signal rename_pressed(cell: Control)
 
 const FoodFly = preload("res://scenes/common/FoodFly.gd")
 ## Food lands a little below the centre of the pet box, roughly at the mouth.
@@ -17,15 +19,19 @@ const DOUBLE_CLICK_MS := 350
 @export var pet_name: String = ""
 @export var pet_type: String = "cat"
 @export var empty: bool = true
+## 这只宠物吃出来的能量，决定它的等级。
+@export var energy: int = 0
 
 @onready var _fence: TextureRect = $Fence
 @onready var _shadow: TextureRect = $Shadow
 @onready var _pet: Control = $PetView
 @onready var _plate: TextureRect = $Plate
 @onready var _name_label: Label = $NameLabel
+@onready var _level_label: Label = $LevelLabel
 @onready var _plus: Label = $Plus
 @onready var _feed: TextureButton = $FeedButton
 @onready var _hit: Button = $Hit
+@onready var _rename_hit: Button = $RenameHit
 @onready var _highlight: Panel = $Highlight
 
 var _is_selected: bool = false
@@ -36,13 +42,17 @@ var _last_click_ms: int = -DOUBLE_CLICK_MS
 func _ready() -> void:
 	_feed.pressed.connect(_on_feed)
 	_hit.pressed.connect(_on_hit)
+	_rename_hit.pressed.connect(func(): rename_pressed.emit(self))
+	_rename_hit.mouse_entered.connect(func(): _plate.modulate = Color(1.12, 1.12, 1.12))
+	_rename_hit.mouse_exited.connect(func(): _plate.modulate = Color.WHITE)
 	_apply()
 
 
-func setup(p_name: String, p_type: String, p_empty: bool = false) -> void:
+func setup(p_name: String, p_type: String, p_empty: bool = false, p_energy: int = 0) -> void:
 	pet_name = p_name
 	pet_type = p_type
 	empty = p_empty
+	energy = p_energy
 	if is_node_ready():
 		_apply()
 
@@ -86,11 +96,14 @@ func _apply() -> void:
 	_feed.visible = not empty
 	_plate.visible = not empty
 	_name_label.visible = not empty
+	_rename_hit.visible = not empty
+	_level_label.visible = not empty
 	_plus.visible = empty
 	_highlight.visible = _is_selected and not empty
 	if not empty:
 		_pet.set_pet(pet_type)
 		_name_label.text = pet_name
+		_level_label.text = "Lv.%d · %d" % [PetState.level_of(energy), energy]
 
 
 func _on_feed() -> void:

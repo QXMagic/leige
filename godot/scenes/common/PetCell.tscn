@@ -115,6 +115,36 @@ theme_override_font_sizes/font_size = 27
 text = "Luna"
 horizontal_alignment = 1
 vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="RenameHit" type="Button" parent="." unique_id=1716204583]
+layout_mode = 0
+offset_left = 56.0
+offset_top = 198.0
+offset_right = 246.0
+offset_bottom = 244.0
+tooltip_text = "点击改名"
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxEmpty_hy0bk")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_s5stt")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_jmsha")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_vkry8")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_74eto")
+flat = true
+
+[node name="LevelLabel" type="Label" parent="." unique_id=1716204590]
+layout_mode = 0
+offset_left = 252.0
+offset_top = 200.0
+offset_right = 388.0
+offset_bottom = 242.0
+theme_override_colors/font_color = Color(0.9529412, 0.827451, 0.6901961, 1)
+theme_override_colors/font_outline_color = Color(0.35, 0.18, 0.08, 0.85)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 24
+text = "Lv.1 · 0"
+horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="Plus" type="Label" parent="." unique_id=1883828716]
 layout_mode = 0
