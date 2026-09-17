@@ -27,6 +27,7 @@ var _compared := false
 var _busy := false
 var _applying := false
 var _timer := Timer.new()
+var _fetching_reasons := false
 
 
 func _ready() -> void:
@@ -40,6 +41,38 @@ func _ready() -> void:
 		_sync()
 	else:
 		boot_done = true
+
+
+## 老师在积分设置页（另一个浏览器标签）改完回到游戏时，窗口重新拿到焦点，顺手拉一次。
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_IN:
+		refresh_reasons()
+
+
+## 从服务端拉这个账号的加减分项目，拉到了交给 ScoreState。没登录就等登录后再拉。
+func refresh_reasons() -> void:
+	if not enabled or _fetching_reasons or ApiClient.api_token.is_empty():
+		return
+	_fetching_reasons = true
+	ApiClient.send(HTTPClient.METHOD_GET, "/teacher_reason/lists", {}, func(ok: bool, code: int, data: Variant, _msg: String):
+		_fetching_reasons = false
+		if ok and typeof(data) == TYPE_DICTIONARY and typeof(data.get("items")) == TYPE_ARRAY:
+			ScoreState.set_reasons(data["items"])
+		elif code == -1 and not _busy:
+			ApiClient.api_token = ""
+			_sync()
+	)
+
+
+## 积分设置页的地址，token 放在 # 后面：不会发到服务器、不进访问日志，页面读完就从
+## 地址栏抹掉。页面只能改这个 token 对应的账号，所以和其他老师的客户端互不串。
+## 还没登录上服务器时返回 ""。
+func teacher_page_url() -> String:
+	if ApiClient.api_token.is_empty():
+		return ""
+	var base := ApiClient.base_url.trim_suffix("/")
+	base = base.trim_suffix("/api")
+	return "%s/teacher/#token=%s" % [base, ApiClient.api_token.uri_encode()]
 
 
 func _on_local_saved() -> void:
@@ -74,6 +107,7 @@ func _login() -> void:
 			return
 		ApiClient.api_token = str(data["token"])
 		user_id = int(data.get("user_id", 0))
+		refresh_reasons()
 		_sync()
 	ApiClient.send(HTTPClient.METHOD_POST, "/login/guestLogin", body, done, BOOT_WAIT_SECONDS)
 

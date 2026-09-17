@@ -1,6 +1,8 @@
 extends Control
 ## 主场景 / 班级草地 —— 参考 resource/references/preview_3.jpg
 ##
+## 左侧「积分设置」打开网页版管理页，老师在里面增删加减分项目，只影响这台客户端。
+##
 ## 草地上的 4 个位置就是班级的 4 个小组：位置 g 站着 PetState.lawn[g] 那只宠
 ## 物，也就是庇护所第 g 列当前出场的那只。点宠物弹菜单：表现好给积分，投喂花
 ## 积分，宠物吃了才长能量。脚下铭牌显示组名、能量条和剩余积分，左上角是按能
@@ -10,7 +12,6 @@ extends Control
 ## 改缩放，脚本不关心它们具体在哪。
 
 signal enter_sanctuary()
-signal closed()
 
 const CHOICE_MENU_SCENE := "res://scenes/common/ChoiceMenu.tscn"
 const FloatText = preload("res://scenes/common/FloatText.gd")
@@ -29,10 +30,10 @@ const SAD_TIME := 2.5
 const UNDO_DISABLED_ALPHA := 0.45
 
 @onready var _house: Button = $HouseHotspot
-@onready var _close: TextureButton = $CloseButton
 @onready var _pets: Control = $Pets
 @onready var _rank: Control = $RankBoard
 @onready var _undo: TextureButton = $UndoButton
+@onready var _manage: TextureButton = $ManageButton
 @onready var _state: Node = get_node("/root/PetState")
 
 var _spots: Array[Control] = []
@@ -41,8 +42,8 @@ var _menu: Control = null
 
 func _ready() -> void:
 	_house.pressed.connect(func(): enter_sanctuary.emit())
-	_close.pressed.connect(func(): closed.emit())
 	_undo.pressed.connect(func(): ScoreState.undo_last())
+	_manage.pressed.connect(_open_teacher_page)
 	for i in _state.GROUP_COUNT:
 		var spot: Control = _pets.get_node("Spot%d" % (i + 1))
 		spot.get_node("Hit").pressed.connect(_on_pet_pressed.bind(i))
@@ -50,6 +51,7 @@ func _ready() -> void:
 		_spots.append(spot)
 	_state.lawn_changed.connect(func(_lawn): _sync_pets())
 	_state.pet_energy_changed.connect(func(index: int, _e: int): _sync_plate(_state.group_of(index)))
+	_state.pen_unlocked.connect(_on_pen_unlocked)
 	ScoreState.points_changed.connect(_on_points_changed)
 	ScoreState.fed.connect(_on_fed)
 	ScoreState.group_renamed.connect(func(group: int, _n: String): _sync_plate(group))
@@ -57,6 +59,8 @@ func _ready() -> void:
 	for i in _spots.size():
 		_sync_plate(i)
 	_rank.refresh(ScoreState.ranking(), false)
+	# 每次回到主场景都拉一次，老师刚在设置页改过的项目马上生效。
+	CloudSave.refresh_reasons()
 	_sync_undo()
 
 
@@ -108,6 +112,13 @@ func _on_fed(group: int, index: int, _cost: int, gain: int, is_undo: bool) -> vo
 	if spot == null or is_undo or _state.lawn_pet(group) != index:
 		return
 	_feed(spot, gain)
+
+
+## 升级解锁了新栏位：在这组宠物头顶提示一下，去庇护所就能领养。
+func _on_pen_unlocked(index: int) -> void:
+	var spot := _visible_spot(_state.group_of(index))
+	if spot != null:
+		_pop(spot, "解锁第 %d 只宠物栏位！" % (index / _state.GROUP_COUNT + 1), FloatText.GAIN)
 
 
 func _visible_spot(group: int) -> Control:
@@ -175,22 +186,28 @@ func _title_for(group: int) -> String:
 
 func _reason_items(group: int) -> Array:
 	var items: Array = []
-	for r: Dictionary in ScoreState.REASONS:
-		var delta := int(r["delta"])
-		items.append({
-			"id": str(r["id"]),
-			"label": str(r["label"]),
-			"note": "%+d 分" % delta,
-			"positive": delta >= 0,
-		})
-	# 这一组还没有宠物上场时就没什么可喂的。
+	# 这一组还没有宠物上场时就没什么可喂的。投喂最常用，放最前面。
 	if _state.lawn_pet(group) >= 0:
 		items.append({
 			"id": FEED_ITEM_ID,
 			"label": "投喂…",
 			"note": "花积分换能量",
 			"positive": true,
+			"group": "投喂",
 		})
+	# 老师自定义的项目可能有几十个，加分、扣分各归一段，段内保持设置页里的顺序。
+	for positive: bool in [true, false]:
+		for r: Dictionary in ScoreState.reasons:
+			var delta := int(r["delta"])
+			if (delta > 0) != positive:
+				continue
+			items.append({
+				"id": str(r["id"]),
+				"label": str(r["label"]),
+				"note": "%+d 分" % delta,
+				"positive": positive,
+				"group": "加分" if positive else "扣分",
+			})
 	return items
 
 
@@ -222,3 +239,16 @@ func _rename_group(group: int) -> void:
 		ScoreState.NAME_MAX_LENGTH, ScoreState.validate_group_name.bind(group))
 	if new_name != null:
 		ScoreState.set_group_name(group, new_name)
+
+
+## 设置页是网页，放在服务器上；链接里带着这台客户端的登录凭证，所以只能改自己的菜单。
+func _open_teacher_page() -> void:
+	if Modal.has_open():
+		return
+	var url := CloudSave.teacher_page_url()
+	if url.is_empty():
+		Modal.alert("暂时连不上服务器", "积分设置保存在服务器上，网络恢复后再点一次试试。")
+		return
+	var err := OS.shell_open(url)
+	if err != OK:
+		Modal.alert("打不开设置页", "浏览器没有打开新页面，请检查是否拦截了弹出窗口。")

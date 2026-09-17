@@ -4,22 +4,21 @@ extends Control
 signal adopted(pet_type: String, pet_label: String)
 signal closed()
 
-## Mirrors the reference: only the first two entries offer a 领养 button.
+## 宠物市场里的候选，都可以领养，不同小组也能领同一种。
 const CANDIDATES := [
-	{"type": "hamster", "label": "Nibbles", "adoptable": true},
-	{"type": "dog", "label": "Shiba", "adoptable": true},
-	{"type": "cat", "label": "Ginger", "adoptable": false},
-	{"type": "rabbit", "label": "Cotton", "adoptable": false},
-	{"type": "bear", "label": "Barley", "adoptable": false},
-	{"type": "sheep", "label": "Cloud", "adoptable": false},
-	{"type": "panda", "label": "Dumpling", "adoptable": false},
+	{"type": "hamster", "label": "Nibbles"},
+	{"type": "dog", "label": "Shiba"},
+	{"type": "cat", "label": "Ginger"},
+	{"type": "rabbit", "label": "Cotton"},
+	{"type": "bear", "label": "Barley"},
+	{"type": "sheep", "label": "Cloud"},
+	{"type": "panda", "label": "Dumpling"},
 ]
 
 @onready var _scroll: ScrollContainer = $Panel/Scroll
 @onready var _grid: GridContainer = $Panel/Scroll/Grid
 @onready var _close: TextureButton = $Panel/CloseButton
 @onready var _dim: ColorRect = $Dim
-@onready var _state: Node = get_node("/root/PetState")
 
 
 func _ready() -> void:
@@ -30,9 +29,7 @@ func _ready() -> void:
 		var slot: Control = _grid.get_child(i)
 		if i < CANDIDATES.size():
 			var c: Dictionary = CANDIDATES[i]
-			# A candidate already living in a pen can no longer be adopted.
-			var can_adopt: bool = bool(c["adoptable"]) and not _state.is_owned(str(c["label"]))
-			slot.setup(str(c["type"]), str(c["label"]), can_adopt)
+			slot.setup(str(c["type"]), str(c["label"]), true)
 			slot.adopt_pressed.connect(_on_adopt)
 		else:
 			slot.visible = false

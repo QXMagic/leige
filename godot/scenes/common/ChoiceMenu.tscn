@@ -59,6 +59,12 @@ text = "第1组 · 加减分"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="List" type="VBoxContainer" parent="Panel/Content"]
+[node name="Scroll" type="ScrollContainer" parent="Panel/Content"]
 layout_mode = 2
+horizontal_scroll_mode = 0
+scroll_deadzone = 12
+
+[node name="List" type="VBoxContainer" parent="Panel/Content/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 12

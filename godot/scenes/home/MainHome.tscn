@@ -2,12 +2,12 @@
 
 [ext_resource type="Script" uid="uid://ct8fg6oi1uagq" path="res://scenes/home/MainHome.gd" id="1_atpko"]
 [ext_resource type="Texture2D" uid="uid://bwqjw01qlnok0" path="res://resource/sprites/illustration.png" id="2_snw6s"]
-[ext_resource type="Texture2D" uid="uid://bf0pb4grb10ko" path="res://resource/ui/btn_close.png" id="3_24n2f"]
 [ext_resource type="Texture2D" uid="uid://cdyrxmrbu6k63" path="res://resource/ui/shadow.png" id="3_aw3bj"]
 [ext_resource type="Script" uid="uid://b5n4jpeg4vwc6" path="res://scenes/pet/PetView.gd" id="4_npvya"]
 [ext_resource type="PackedScene" path="res://scenes/common/GroupPlate.tscn" id="5_plate"]
 [ext_resource type="PackedScene" path="res://scenes/home/RankBoard.tscn" id="6_rank"]
 [ext_resource type="Texture2D" path="res://resource/ui/btn_red.png" id="7_red"]
+[ext_resource type="Texture2D" path="res://resource/ui/btn_green.png" id="8_green"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_24n2f"]
 
@@ -287,6 +287,35 @@ text = "撤销"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="ManageButton" type="TextureButton" parent="."]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 508.0
+offset_right = 260.0
+offset_bottom = 592.0
+tooltip_text = "设置加分、扣分项目"
+focus_mode = 0
+texture_normal = ExtResource("8_green")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Label" type="Label" parent="ManageButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.9529412, 0.85882354, 1)
+theme_override_colors/font_outline_color = Color(0.2, 0.3, 0.1, 0.6)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 34
+text = "积分设置"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="HouseHotspot" type="Button" parent="." unique_id=2086114768]
 layout_mode = 0
 offset_left = 701.0
@@ -301,12 +330,3 @@ theme_override_styles/disabled = SubResource("StyleBoxEmpty_c1adn")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_0kh6c")
 flat = true
 
-[node name="CloseButton" type="TextureButton" parent="." unique_id=461575929]
-layout_mode = 0
-offset_left = 1715.0
-offset_top = 62.0
-offset_right = 1791.0
-offset_bottom = 132.0
-texture_normal = ExtResource("3_24n2f")
-ignore_texture_size = true
-stretch_mode = 0

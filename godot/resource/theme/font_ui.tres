@@ -1,7 +1,12 @@
-[gd_resource type="SystemFont" format=3]
+[gd_resource type="FontVariation" load_steps=3 format=3]
+
+[ext_resource type="FontFile" path="res://resource/theme/NotoSansSC-Medium.otf" id="1_noto"]
+
+[sub_resource type="SystemFont" id="SystemFont_fallback"]
+font_names = PackedStringArray("Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "sans-serif")
+font_weight = 600
 
 [resource]
-font_names = PackedStringArray("Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans CJK SC", "PingFang SC", "Source Han Sans SC", "sans-serif")
-font_weight = 600
-antialiasing = 1
-multichannel_signed_distance_field = false
+fallbacks = Array[Font]([SubResource("SystemFont_fallback")])
+base_font = ExtResource("1_noto")
+variation_embolden = 0.2

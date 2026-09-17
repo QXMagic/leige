@@ -11,6 +11,8 @@ extends Node
 signal roster_changed(roster: Array)
 signal lawn_changed(lawn: Array)
 signal pet_energy_changed(index: int, energy: int)
+## 宠物升级让本组一个新栏位可以领养了。
+signal pen_unlocked(index: int)
 ## 本地存档写完了，CloudSave 听这个去同步。
 signal saved()
 
@@ -22,21 +24,8 @@ const NAME_MAX_LENGTH := 8
 const LEVEL_STEP := 100
 const SAVE_FILE := "class_pets.json"
 
-## 开局名册，按列分给 4 个小组。第 2 列留了一个空栏用来试领养。
-const DEFAULT_ROSTER := [
-	{"name": "Luna", "type": "cat"},
-	{"name": "Rocky", "type": "dog"},
-	{"name": "Clover", "type": "sheep"},
-	{"name": "Mochi", "type": "panda"},
-	{"name": "Pip", "type": "dog"},
-	{"name": "Snowball", "type": "rabbit"},
-	{"name": "Mittens", "type": "cat"},
-	{"name": "Coco", "type": "hamster"},
-	{"name": "Bamboo", "type": "panda"},
-	{},
-	{"name": "Rex", "type": "bear"},
-	{"name": "Bella", "type": "dog"},
-]
+## 开局一只宠物都没有，老师第一次打开时在宠物市场里领养第一只。
+const DEFAULT_ROSTER := []
 
 var roster: Array = []
 ## 每个小组正在草地上的宠物栏位，-1 表示这组还没有宠物。
@@ -152,9 +141,13 @@ func energy_of(index: int) -> int:
 func add_energy(index: int, amount: int) -> int:
 	if is_empty_slot(index):
 		return 0
+	var locked := _locked_pens(group_of(index))
 	var total: int = maxi(0, energy_of(index) + amount)
 	roster[index]["energy"] = total
 	pet_energy_changed.emit(index, total)
+	for pen: int in locked:
+		if is_unlocked(pen):
+			pen_unlocked.emit(pen)
 	save_pets()
 	return total
 
@@ -180,24 +173,44 @@ func pet_level(index: int) -> int:
 	return level_of(energy_of(index))
 
 
+# ---- 栏位解锁 -----------------------------------------------------------
+
+## 领养这个栏位要本组最高等级达到几级。每组第 1 栏开局就能领；第一只升到 2 级
+## 开第 2 栏；最高等级再升一级（3 级）开第 3 栏。
+func unlock_level(index: int) -> int:
+	return index / GROUP_COUNT + 1
+
+
+## 本组宠物里最高的等级，还没有宠物时为 0。
+func top_level(group: int) -> int:
+	var best := 0
+	for pen: int in pens_of(group):
+		if not is_empty_slot(pen):
+			best = maxi(best, pet_level(pen))
+	return best
+
+
+## 已经住了宠物的栏位也算解锁：撤销投喂掉级不会把领养过的宠物收回去。
+func is_unlocked(index: int) -> bool:
+	if index < 0 or index >= SLOT_COUNT:
+		return false
+	return unlock_level(index) <= 1 or not is_empty_slot(index) 		or top_level(group_of(index)) >= unlock_level(index)
+
+
+func _locked_pens(group: int) -> Array:
+	return pens_of(group).filter(func(pen: int): return not is_unlocked(pen))
+
+
 # ---- 领养与改名 ---------------------------------------------------------
 
-## 这只待领养的宠物是不是已经被领走了——领养时记下的是候选名，所以宠物改名
-## 之后这里判断不受影响。
-func is_owned(candidate: String) -> bool:
-	for p in roster:
-		if not p.is_empty() and str(p.get("candidate", "")) == candidate:
-			return true
-	return false
-
-
-func adopt(slot_index: int, pet_type: String, pet_name: String) -> bool:
+## candidate 是宠物市场里的候选名，同一种宠物可以被好几个小组领养。
+func adopt(slot_index: int, pet_type: String, candidate: String) -> bool:
 	if slot_index < 0 or slot_index >= roster.size():
 		return false
-	if not roster[slot_index].is_empty() or is_owned(pet_name):
+	if not roster[slot_index].is_empty() or not is_unlocked(slot_index):
 		return false
 	roster[slot_index] = {
-		"name": pet_name, "type": pet_type, "candidate": pet_name, "energy": 0,
+		"name": _unique_name(candidate), "type": pet_type, "candidate": candidate, "energy": 0,
 	}
 	_fill_lawn()
 	roster_changed.emit(roster)
@@ -218,6 +231,24 @@ func validate_name(pet_name: String, index: int) -> String:
 		if i != index and not roster[i].is_empty() and str(roster[i].get("name", "")) == pet_name:
 			return "已经有叫「%s」的宠物了" % pet_name
 	return ""
+
+
+## 默认名字重了就在后面加数字，并截短到 NAME_MAX_LENGTH 以内。
+func _unique_name(base: String) -> String:
+	var pet_name := base.left(NAME_MAX_LENGTH)
+	var n := 2
+	while _name_taken(pet_name):
+		var suffix := str(n)
+		pet_name = base.left(NAME_MAX_LENGTH - suffix.length()) + suffix
+		n += 1
+	return pet_name
+
+
+func _name_taken(pet_name: String) -> bool:
+	for p: Dictionary in roster:
+		if not p.is_empty() and str(p.get("name", "")) == pet_name:
+			return true
+	return false
 
 
 func rename(index: int, pet_name: String) -> bool:

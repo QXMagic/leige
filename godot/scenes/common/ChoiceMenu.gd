@@ -5,7 +5,11 @@ extends Control
 ##   menu.setup("第1组 · 35积分", items, anchor)
 ##   menu.picked.connect(...)
 ##
-## items 每项：{id, label, note(右侧小字，可选), positive(绿/红), disabled}
+## items 每项：{id, label, note(右侧小字，可选), positive(绿/红), disabled,
+##            group(分组标题，可选：相邻同 group 的项归到一个标题下)}
+##
+## 项目多了（老师自定义的加减分可能有几十个）就排成多列，还放不下就在面板里滚动；
+## 多列时菜单开在屏幕中间，少的时候仍然开在宠物头顶。
 
 signal picked(id: String)
 signal closed()
@@ -22,14 +26,27 @@ const GAP := 30.0
 const MARGIN := 24.0
 const OPEN_TIME := 0.16
 
+const BUTTON_WIDTH := 340.0
+const BUTTON_HEIGHT := 74.0
+const CELL_GAP := 12
+const MAX_COLUMNS := 4
+## 不超过这么多项就一列排开，和以前一样。
+const SINGLE_COLUMN_MAX := 6
+## 面板四周内边距 + 滚动条留位，算列数和高度时要扣掉。
+const PANEL_PADDING := Vector2(44, 42)
+const SCROLLBAR_ROOM := 18.0
+
 @onready var _dim: ColorRect = $Dim
 @onready var _panel: PanelContainer = $Panel
 @onready var _title: Label = $Panel/Content/Title
-@onready var _list: VBoxContainer = $Panel/Content/List
+@onready var _content: VBoxContainer = $Panel/Content
+@onready var _scroll: ScrollContainer = $Panel/Content/Scroll
+@onready var _list: VBoxContainer = $Panel/Content/Scroll/List
 
 var _title_text: String = ""
 var _items: Array = []
 var _anchor: Vector2 = Vector2(960, 540)
+var _columns: int = 1
 
 
 ## `anchor` 是宠物头顶在本节点坐标系里的位置，菜单会开在它上方。
@@ -52,9 +69,49 @@ func _apply() -> void:
 	for child in _list.get_children():
 		_list.remove_child(child)
 		child.queue_free()
-	for item: Dictionary in _items:
-		_list.add_child(_make_button(item))
+	_columns = _columns_for(_items.size())
+	var sections := _sections()
+	for section: Dictionary in sections:
+		if sections.size() > 1 and str(section["title"]) != "":
+			_list.add_child(_make_header(str(section["title"])))
+		var grid := GridContainer.new()
+		grid.columns = _columns
+		grid.add_theme_constant_override("h_separation", CELL_GAP)
+		grid.add_theme_constant_override("v_separation", CELL_GAP)
+		for item: Dictionary in section["items"]:
+			grid.add_child(_make_button(item))
+		_list.add_child(grid)
 	_place.call_deferred()
+
+
+## 列数随项目数增加，但不超过屏幕宽度放得下的列数。
+func _columns_for(count: int) -> int:
+	var wanted := 1
+	if count > SINGLE_COLUMN_MAX:
+		wanted = 2 if count <= 14 else (3 if count <= 30 else MAX_COLUMNS)
+	var room := size.x if size.x > 0 else get_viewport_rect().size.x
+	var fit := int((room - MARGIN * 2 - PANEL_PADDING.x - SCROLLBAR_ROOM + CELL_GAP) / (BUTTON_WIDTH + CELL_GAP))
+	return clampi(wanted, 1, maxi(1, fit))
+
+
+## 按 group 把相邻的项分段，保持原来的顺序。
+func _sections() -> Array:
+	var sections: Array = []
+	for item: Dictionary in _items:
+		var title := str(item.get("group", ""))
+		if sections.is_empty() or sections[-1]["title"] != title:
+			sections.append({"title": title, "items": []})
+		sections[-1]["items"].append(item)
+	return sections
+
+
+func _make_header(text: String) -> Label:
+	var label := Label.new()
+	label.text = text
+	label.add_theme_font_size_override("font_size", 26)
+	label.add_theme_color_override("font_color", _title.get_theme_color("font_color"))
+	label.modulate.a = 0.8
+	return label
 
 
 func _make_button(item: Dictionary) -> Button:
@@ -63,8 +120,11 @@ func _make_button(item: Dictionary) -> Button:
 	var btn := Button.new()
 	btn.text = str(item.get("label", ""))
 	btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	btn.custom_minimum_size = Vector2(0, 74)
+	btn.custom_minimum_size = Vector2(BUTTON_WIDTH, BUTTON_HEIGHT)
+	btn.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	btn.focus_mode = Control.FOCUS_NONE
+	# 让拖动事件继续传给 ScrollContainer，触屏上按住按钮也能滑动列表。
+	btn.mouse_filter = Control.MOUSE_FILTER_PASS
 	btn.disabled = disabled
 	btn.mouse_default_cursor_shape = Control.CURSOR_ARROW if disabled \
 		else Control.CURSOR_POINTING_HAND
@@ -110,11 +170,19 @@ func _style(color: Color) -> StyleBoxFlat:
 	return sb
 
 
-## 菜单开在宠物头顶上方，靠边时贴着屏幕收回来。
+## 菜单开在宠物头顶上方，靠边时贴着屏幕收回来；多列或需要滚动时开在屏幕中间。
 func _place() -> void:
+	var list_size := _list.get_combined_minimum_size()
+	var max_height := size.y - MARGIN * 2 - PANEL_PADDING.y 		- _title.get_combined_minimum_size().y - _content.get_theme_constant("separation")
+	var scrolls := list_size.y > max_height
+	_scroll.custom_minimum_size = Vector2(
+		list_size.x + (SCROLLBAR_ROOM if scrolls else 0.0),
+		minf(list_size.y, max_height))
 	_panel.reset_size()
 	var box := _panel.size
 	var pos := _anchor - Vector2(box.x / 2.0, box.y + GAP)
+	if _columns > 1 or scrolls:
+		pos = (size - box) / 2.0
 	pos.x = clampf(pos.x, MARGIN, size.x - box.x - MARGIN)
 	pos.y = clampf(pos.y, MARGIN, size.y - box.y - MARGIN)
 	_panel.position = pos

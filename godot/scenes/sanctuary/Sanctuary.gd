@@ -38,6 +38,9 @@ func _ready() -> void:
 	ScoreState.fed.connect(func(_g, _i, _c, _gain, _u): _refresh_headers())
 	ScoreState.group_renamed.connect(func(_g, _n): _refresh_headers())
 	_refresh()
+	# 一只宠物都没有（第一次打开）就直接弹出宠物市场，领养到第一个空栏位。
+	if _state.first_filled_slot() < 0 and _state.first_empty_slot() >= 0:
+		_on_add.call_deferred(null, _state.first_empty_slot())
 
 
 func _refresh() -> void:
@@ -45,7 +48,8 @@ func _refresh() -> void:
 		var cell: Control = _grid.get_child(i)
 		var d: Dictionary = _state.pet_at(i)
 		if d.is_empty():
-			cell.setup("", "", true)
+			var need: int = 0 if _state.is_unlocked(i) else _state.unlock_level(i)
+			cell.setup("", "", true, 0, need)
 		else:
 			cell.setup(str(d.get("name", "")), str(d.get("type", "cat")), false,
 				_state.energy_of(i))
@@ -109,6 +113,12 @@ func _on_place_requested(_cell: Control, index: int) -> void:
 
 func _on_add(_cell: Control, index: int) -> void:
 	if _dialog and is_instance_valid(_dialog):
+		return
+	if not _state.is_unlocked(index):
+		var group: int = _state.group_of(index)
+		Modal.alert("栏位未解锁", "%s 的宠物最高 Lv.%d，升到 Lv.%d 就能领养第 %d 只宠物" % [
+			ScoreState.group_name(group), _state.top_level(group),
+			_state.unlock_level(index), index / _state.GROUP_COUNT + 1])
 		return
 	_dialog = (load(ADOPT_DIALOG_SCENE) as PackedScene).instantiate()
 	add_child(_dialog)

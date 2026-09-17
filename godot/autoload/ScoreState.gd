@@ -13,23 +13,28 @@ signal points_changed(group: int, delta: int, total: int, label: String, is_undo
 signal fed(group: int, index: int, cost: int, gain: int, is_undo: bool)
 signal history_changed()
 signal group_renamed(group: int, group_name: String)
+## 加减分项目换了（老师在积分设置页改过，CloudSave 拉回来了）。
+signal reasons_changed()
 ## 本地存档写完了，CloudSave 听这个去同步。
 signal saved()
 
 const GROUP_COUNT := 4
 const NAME_MAX_LENGTH := 6
 const SAVE_FILE := "class_scores.json"
+## 上次从服务端拉到的加减分项目，断网时用它。
+const REASONS_FILE := "reasons.json"
 ## 流水只保留最近这么多条，够撤销和课后回顾用。
 const MAX_HISTORY := 200
 
-## 课堂上一键点击的加减分理由，按班级习惯增删即可。加减的是积分。
-const REASONS := [
-	{"id": "speak", "label": "积极发言", "delta": 5},
-	{"id": "homework", "label": "作业全交", "delta": 10},
-	{"id": "teamwork", "label": "小组合作", "delta": 8},
-	{"id": "help", "label": "帮助同学", "delta": 6},
-	{"id": "noise", "label": "课堂喧哗", "delta": -3},
-	{"id": "late", "label": "迟到早退", "delta": -5},
+## 老师还没在积分设置页改过时的加减分项目，和服务端 TeacherReasonLogic::DEFAULTS
+## 保持一致。加减的是积分。
+const DEFAULT_REASONS := [
+	{"label": "积极发言", "delta": 5},
+	{"label": "作业全交", "delta": 10},
+	{"label": "小组合作", "delta": 8},
+	{"label": "帮助同学", "delta": 6},
+	{"label": "课堂喧哗", "delta": -3},
+	{"label": "迟到早退", "delta": -5},
 ]
 
 ## 投喂菜单：花积分换能量，买大份更划算，鼓励攒一攒再喂。
@@ -39,6 +44,8 @@ const FOODS := [
 	{"id": "feast", "label": "大餐", "cost": 20, "energy": 32},
 ]
 
+## 课堂上一键点击的加减分项目 {id, label, delta}，按菜单顺序。名称唯一，直接当 id。
+var reasons: Array = []
 var groups: Array = []
 ## 加减分和投喂的流水，最新的在最后，撤销从末尾取。
 var history: Array = []
@@ -46,6 +53,8 @@ var history: Array = []
 
 func _ready() -> void:
 	_reset_groups()
+	reasons = _clean_reasons(DEFAULT_REASONS)
+	_load_reasons()
 	load_scores()
 
 
@@ -78,7 +87,7 @@ func group_name(group: int) -> String:
 
 
 func reason(reason_id: String) -> Dictionary:
-	for r in REASONS:
+	for r in reasons:
 		if str(r["id"]) == reason_id:
 			return r
 	return {}
@@ -270,3 +279,47 @@ func load_scores() -> void:
 	var data: Variant = JSON.parse_string(f.get_as_text())
 	if typeof(data) == TYPE_DICTIONARY:
 		apply_save(data)
+
+
+# ---- 加减分项目 ---------------------------------------------------------
+
+## 换成服务端下发的项目并缓存到本地。没变就什么都不做，免得菜单无故刷新。
+func set_reasons(items: Array) -> void:
+	var clean := _clean_reasons(items)
+	if clean.is_empty() or clean == reasons:
+		return
+	reasons = clean
+	var f := FileAccess.open(ClientId.path(REASONS_FILE), FileAccess.WRITE)
+	if f != null:
+		f.store_string(JSON.stringify(reasons))
+	reasons_changed.emit()
+
+
+## 名称为空、分值为 0、名称重复的项目丢掉。
+func _clean_reasons(items: Array) -> Array:
+	var clean: Array = []
+	var seen := {}
+	for item: Variant in items:
+		if typeof(item) != TYPE_DICTIONARY:
+			continue
+		var label := str(item.get("label", "")).strip_edges()
+		var delta := int(item.get("delta", 0))
+		if label.is_empty() or delta == 0 or seen.has(label):
+			continue
+		seen[label] = true
+		clean.append({"id": label, "label": label, "delta": delta})
+	return clean
+
+
+func _load_reasons() -> void:
+	var path := ClientId.path(REASONS_FILE)
+	if not FileAccess.file_exists(path):
+		return
+	var f := FileAccess.open(path, FileAccess.READ)
+	if f == null:
+		return
+	var data: Variant = JSON.parse_string(f.get_as_text())
+	if typeof(data) == TYPE_ARRAY:
+		var clean := _clean_reasons(data)
+		if not clean.is_empty():
+			reasons = clean

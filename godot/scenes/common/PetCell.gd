@@ -1,6 +1,7 @@
 extends Control
 ## One pen in the sanctuary grid: brown slot + fence + pet + name plate + FEED
-## badge. An "empty" cell shows a green plus instead and acts as the adopt slot.
+## badge. An "empty" cell shows a green plus instead and acts as the adopt slot;
+## a locked empty cell shows the level that unlocks it.
 
 signal feed_pressed(cell: Control)
 signal add_pressed(cell: Control)
@@ -21,6 +22,11 @@ const DOUBLE_CLICK_MS := 350
 @export var empty: bool = true
 ## 这只宠物吃出来的能量，决定它的等级。
 @export var energy: int = 0
+## 空栏位还没解锁时，本组宠物要达到的等级；0 表示已解锁。
+@export var locked_level: int = 0
+
+const LOCKED_FONT_SIZE := 34
+const LOCKED_COLOR := Color(0.93, 0.85, 0.74, 0.9)
 
 @onready var _fence: TextureRect = $Fence
 @onready var _shadow: TextureRect = $Shadow
@@ -37,6 +43,8 @@ const DOUBLE_CLICK_MS := 350
 var _is_selected: bool = false
 var _feeding: bool = false
 var _last_click_ms: int = -DOUBLE_CLICK_MS
+var _plus_font_size: int = 0
+var _plus_color: Color
 
 
 func _ready() -> void:
@@ -45,14 +53,18 @@ func _ready() -> void:
 	_rename_hit.pressed.connect(func(): rename_pressed.emit(self))
 	_rename_hit.mouse_entered.connect(func(): _plate.modulate = Color(1.12, 1.12, 1.12))
 	_rename_hit.mouse_exited.connect(func(): _plate.modulate = Color.WHITE)
+	_plus_font_size = _plus.get_theme_font_size("font_size")
+	_plus_color = _plus.get_theme_color("font_color")
 	_apply()
 
 
-func setup(p_name: String, p_type: String, p_empty: bool = false, p_energy: int = 0) -> void:
+func setup(p_name: String, p_type: String, p_empty: bool = false, p_energy: int = 0,
+		p_locked_level: int = 0) -> void:
 	pet_name = p_name
 	pet_type = p_type
 	empty = p_empty
 	energy = p_energy
+	locked_level = p_locked_level
 	if is_node_ready():
 		_apply()
 
@@ -70,7 +82,8 @@ func play_eat() -> void:
 
 
 ## Throws this pet's food from the FEED button into its mouth, then plays eat.
-## Clicks while the food is still in the air are ignored.
+## Only call this once the food has actually been paid for (ScoreState.feed
+## returned true). Clicks while the food is still in the air are ignored.
 func feed() -> void:
 	if empty or _feeding:
 		return
@@ -100,16 +113,21 @@ func _apply() -> void:
 	_level_label.visible = not empty
 	_plus.visible = empty
 	_highlight.visible = _is_selected and not empty
+	var locked := empty and locked_level > 0
+	_plus.text = "Lv.%d
+解锁" % locked_level if locked else "+"
+	_plus.add_theme_font_size_override("font_size", LOCKED_FONT_SIZE if locked else _plus_font_size)
+	_plus.add_theme_color_override("font_color", LOCKED_COLOR if locked else _plus_color)
 	if not empty:
 		_pet.set_pet(pet_type)
 		_name_label.text = pet_name
 		_level_label.text = "Lv.%d · %d" % [PetState.level_of(energy), energy]
 
 
+## FEED 只负责打开食物菜单；买得起、选好食物之后 Sanctuary 才会调 feed() 播动画。
 func _on_feed() -> void:
 	if _feeding:
 		return
-	feed()
 	feed_pressed.emit(self)
 
 

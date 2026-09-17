@@ -27,6 +27,14 @@ func _show_home() -> void:
 	_show(HOME_SCENE)
 
 
+## 启动页之后：还没有宠物就直接进庇护所，让老师先领养第一只。
+func _show_start() -> void:
+	if PetState.first_filled_slot() < 0:
+		_show_sanctuary()
+	else:
+		_show_home()
+
+
 func _show_sanctuary() -> void:
 	_show(SANCTUARY_SCENE)
 
@@ -61,16 +69,13 @@ func _swap(view: Control) -> void:
 
 func _wire(view: Control) -> void:
 	if view.has_signal("finished"):
-		view.finished.connect(_show_home)
+		view.finished.connect(_show_start)
 	if view.has_signal("enter_sanctuary"):
 		view.enter_sanctuary.connect(_show_sanctuary)
 	if view.has_signal("closed"):
 		view.closed.connect(_on_view_closed.bind(view))
 
 
-func _on_view_closed(view: Control) -> void:
-	# The sanctuary closes back to the home screen; the home screen exits.
-	if view.scene_file_path == SANCTUARY_SCENE:
-		_show_home()
-	else:
-		get_tree().quit()
+func _on_view_closed(_view: Control) -> void:
+	# Only the sanctuary closes; it goes back to the home screen.
+	_show_home()
