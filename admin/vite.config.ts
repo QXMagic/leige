@@ -37,7 +37,7 @@ function getElementPlusStylePaths() {
 }
 
 export default defineConfig({
-    base: '/huarong/admin/',
+    base: '/college/admin/',
     server: {
         host: '0.0.0.0',
         hmr: true,

@@ -14,6 +14,14 @@ signal request_failed(endpoint: String, err: String)
 
 # ========== Public ==========
 
+func _ready() -> void:
+	# 网页版和后端同域部署：游戏在 <站点>/college/game/，接口在 <站点>/college/api，
+	# 按页面地址推出来，换域名或二级目录都不用改代码。
+	if OS.has_feature("web"):
+		var url: Variant = JavaScriptBridge.eval("new URL('../api', window.location.href).href")
+		if url is String and not url.is_empty():
+			base_url = url.rstrip("/")
+
 func configure(url: String, token: String = "") -> void:
 	base_url = url.rstrip("/")
 	api_token = token

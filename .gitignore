@@ -1,1 +1,4 @@
 admin/.env
+
+# Web 导出产物
+/build/
